@@ -1,4 +1,4 @@
-# Morphic
+# Arc Lab
 
 An AI-powered search engine with a generative UI.
 
@@ -155,7 +155,7 @@ Visit http://localhost:3000 in your browser.
 
 ## 🌐 Deploy
 
-Host your own live version of Morphic with Vercel, Cloudflare Pages, or Docker.
+Host your own live version of Arc Lab with Vercel, Cloudflare Pages, or Docker.
 
 ### Vercel
 
@@ -188,20 +188,20 @@ The default model configuration is located at `public/config/models.json`. For D
 
 ### Setting up the Search Engine in Your Browser
 
-If you want to use Morphic as a search engine in your browser, follow these steps:
+If you want to use Arc Lab as a search engine in your browser, follow these steps:
 
 1. Open your browser settings.
 2. Navigate to the search engine settings section.
 3. Select "Manage search engines and site search".
 4. Under "Site search", click on "Add".
 5. Fill in the fields as follows:
-   - **Search engine**: Morphic
+   - **Search engine**: Arc Lab
    - **Shortcut**: morphic
    - **URL with %s in place of query**: `https://morphic.sh/search?q=%s`
 6. Click "Add" to save the new search engine.
-7. Find "Morphic" in the list of site search, click on the three dots next to it, and select "Make default".
+7. Find "Arc Lab" in the list of site search, click on the three dots next to it, and select "Make default".
 
-This will allow you to use Morphic as your default search engine in the browser.
+This will allow you to use Arc Lab as your default search engine in the browser.
 
 ## 💙 Sponsors
 
@@ -213,7 +213,7 @@ This project is proudly supported by:
 
 ## 👥 Contributing
 
-We welcome contributions to Morphic! Whether it's bug reports, feature requests, or pull requests, all contributions are appreciated.
+We welcome contributions to Arc Lab! Whether it's bug reports, feature requests, or pull requests, all contributions are appreciated.
 
 Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
 

@@ -1,12 +1,12 @@
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-  SidebarTrigger
+    Sidebar,
+    SidebarContent,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarRail,
+    SidebarTrigger
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 import { Plus } from 'lucide-react'
@@ -22,7 +22,7 @@ export default function AppSidebar() {
       <SidebarHeader className="flex flex-row justify-between items-center">
         <Link href="/" className="flex items-center gap-2 px-2 py-3">
           <IconLogo className={cn('size-5')} />
-          <span className="font-semibold text-sm">Morphic</span>
+          <span className="font-semibold text-sm">Arc Lab</span>
         </Link>
         <SidebarTrigger />
       </SidebarHeader>

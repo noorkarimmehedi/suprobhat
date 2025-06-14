@@ -1,6 +1,6 @@
-# Contributing to Morphic
+# Contributing to Arc Lab
 
-Thank you for your interest in contributing to Morphic! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Arc Lab! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
