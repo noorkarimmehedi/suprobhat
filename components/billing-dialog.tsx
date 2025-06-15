@@ -26,7 +26,7 @@ const plans = [
   {
     name: 'Pro',
     description: 'Best for professionals and small teams',
-    price: '$29',
+    price: '$15',
     period: '/month',
     features: [
       'Everything in Free',
