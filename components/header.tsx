@@ -5,7 +5,8 @@ import GuestMenu from '@/components/guest-menu'
 import UserMenu from '@/components/user-menu'
 import { cn } from '@/lib/utils'
 import { Plus } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useTransition } from 'react'
 import { Button } from './ui/button'
 
 interface HeaderProps {
@@ -13,6 +14,15 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ user }) => {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  const handleNewChat = () => {
+    startTransition(() => {
+      router.push('/')
+    })
+  }
+
   return (
     <header
       className={cn(
@@ -22,11 +32,19 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <Button asChild variant="ghost" size="icon" className="size-8 mr-2">
-            <Link href="/" title="New Chat">
-              <Plus className="size-5" />
-              <span className="sr-only">New Chat</span>
-            </Link>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={cn(
+              "size-8 mr-2",
+              isPending && "opacity-50"
+            )}
+            onClick={handleNewChat}
+            disabled={isPending}
+            title="New Chat"
+          >
+            <Plus className="size-5" />
+            <span className="sr-only">New Chat</span>
           </Button>
         </div>
 
