@@ -51,8 +51,20 @@ export function Chat({
     body: {
       id
     },
+    onResponse: response => {
+      // Get the chat ID from response headers if this is a new chat
+      if (id === 'new') {
+        const chatId = response.headers.get('X-Chat-ID')
+        if (chatId) {
+          window.history.replaceState({}, '', `/search/${chatId}`)
+        }
+      }
+    },
     onFinish: () => {
-      window.history.replaceState({}, '', `/search/${id}`)
+      // Only update URL if we're not in a new chat
+      if (id !== 'new') {
+        window.history.replaceState({}, '', `/search/${id}`)
+      }
       window.dispatchEvent(new CustomEvent('chat-history-updated'))
     },
     onError: error => {

@@ -3,6 +3,7 @@ import { createManualToolStreamResponse } from '@/lib/streaming/create-manual-to
 import { createToolCallingStreamResponse } from '@/lib/streaming/create-tool-calling-stream'
 import { Model } from '@/lib/types/models'
 import { isProviderEnabled } from '@/lib/utils/registry'
+import { generateId } from 'ai'
 import { cookies } from 'next/headers'
 
 export const maxDuration = 30
@@ -29,6 +30,9 @@ export async function POST(req: Request) {
         statusText: 'Forbidden'
       })
     }
+
+    // Generate a new chat ID if this is a new chat
+    const finalChatId = chatId === 'new' ? generateId() : chatId
 
     const cookieStore = await cookies()
     const modelJson = cookieStore.get('selectedModel')?.value
@@ -59,21 +63,25 @@ export async function POST(req: Request) {
 
     const supportsToolCalling = selectedModel.toolCallType === 'native'
 
-    return supportsToolCalling
-      ? createToolCallingStreamResponse({
+    const response = supportsToolCalling
+      ? await createToolCallingStreamResponse({
           messages,
           model: selectedModel,
-          chatId,
+          chatId: finalChatId,
           searchMode,
           userId
         })
-      : createManualToolStreamResponse({
+      : await createManualToolStreamResponse({
           messages,
           model: selectedModel,
-          chatId,
+          chatId: finalChatId,
           searchMode,
           userId
         })
+
+    // Add the chat ID to the response headers
+    response.headers.set('X-Chat-ID', finalChatId)
+    return response
   } catch (error) {
     console.error('API route error:', error)
     return new Response('Error processing your request', {
