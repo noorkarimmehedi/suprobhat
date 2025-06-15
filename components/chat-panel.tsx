@@ -199,6 +199,7 @@ export function ChatPanel({
   const generateSuperPrompt = async (userInput: string) => {
     try {
       setIsGeneratingPrompt(true)
+      let promptText = ''
 
       const response = await fetch('/api/generate-super-prompt', {
         method: 'POST',
@@ -212,15 +213,29 @@ export function ChatPanel({
         throw new Error('Failed to generate super prompt')
       }
 
-      const { prompt } = await response.json()
-
-      if (!prompt) {
-        throw new Error('No prompt was generated')
+      if (!response.body) {
+        throw new Error('No response body')
       }
 
-      handleInputChange({
-        target: { value: prompt }
-      } as React.ChangeEvent<HTMLTextAreaElement>)
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        promptText += chunk
+
+        // Update the input field with the streaming text
+        handleInputChange({
+          target: { value: promptText }
+        } as React.ChangeEvent<HTMLTextAreaElement>)
+      }
+
+      if (!promptText) {
+        throw new Error('No prompt was generated')
+      }
 
       toast.success('Super prompt generated!')
     } catch (error) {

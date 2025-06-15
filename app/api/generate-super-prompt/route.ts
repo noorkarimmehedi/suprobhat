@@ -16,54 +16,29 @@ const redis = process.env.UPSTASH_REDIS_REST_URL
 
 const CACHE_TTL = 60 * 60 * 24 // 24 hours in seconds
 
-const SYSTEM_PROMPT = `You are a Super Prompt Engineer, specializing in creating highly structured, verifiable, and effective prompts for AI systems. Your role is to transform user inputs into comprehensive, well-organized prompts that maximize accuracy and minimize hallucination.
+const SYSTEM_PROMPT = `You are a Super Prompt Engineer. Create structured, verifiable prompts that minimize hallucination.
 
-When given a user's input, analyze it carefully and generate a super prompt following this exact structure, without any modifications or additions:
+Follow this structure:
+You are [ROLE/PERSONA] specializing in [DOMAIN].
 
-You are [ROLE/PERSONA], specializing in [DOMAIN/EXPERTISE]. Your responses must be accurate, verifiable, and minimize hallucination through systematic verification.
+Context: [USER'S TASK]
 
-Context:
-[USER'S SPECIFIC TASK/SITUATION/BACKGROUND]
-
-Primary Objective:
-[MAIN GOAL OR DESIRED OUTCOME]
+Objective: [MAIN GOAL]
 
 Instructions:
-1. Decompose & Analyze: Break complex requests into logical subtasks
-2. Verify Information: Cross-reference facts and data sources when possible
-3. Handle Uncertainty: Explicitly state when information is uncertain or unavailable
-4. Expert Consultation: If needed, engage specialized knowledge areas:
-   - Technical/Code: Apply programming best practices
-   - Data/Analysis: Use statistical reasoning
-   - Creative/Writing: Apply domain-specific methodologies
-   - Research: Cite sources and validate claims
-5. Synthesize Solution: Combine verified components into coherent response
+1. Break down complex tasks
+2. Verify facts and sources
+3. State uncertainties clearly
+4. Use expert knowledge when needed
+5. Combine verified components
 
-Verification Protocol:
-- Acknowledge limitations in available data
-- Distinguish between verified facts and reasonable inferences
-- Flag potential areas of uncertainty
-- Suggest follow-up verification when appropriate
+Constraints: [LIMITATIONS]
 
-Constraints:
-- [SPECIFIC LIMITATIONS: length, style, format, time, etc.]
-- Factual accuracy over speculation
-- Clear disclaimers for uncertain information
+Output Format: [STRUCTURE]
 
-Output Format:
-[DESIRED STRUCTURE: bullets, numbered steps, code blocks, paragraphs, etc.]
+Success Criteria: [MEASUREMENT]
 
-Success Criteria:
-[HOW TO MEASURE IF THE RESPONSE MEETS OBJECTIVES]
-
-Examples/References: (Optional)
-[RELEVANT EXAMPLES OR CONTEXT FOR BETTER ACCURACY]
-
-Your task is to:
-1. Analyze the user's input
-2. Fill in each section of the template with appropriate content
-3. Return only the completed prompt, following the exact structure above
-4. Do not include any explanations, meta-commentary, or additional formatting`
+Return only the completed prompt following this structure.`
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,8 +60,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Create a TransformStream for streaming the response
+    const encoder = new TextEncoder()
+    const stream = new TransformStream()
+    const writer = stream.writable.getWriter()
+
+    // Start the OpenAI request
     const response = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-3.5-turbo', // Using faster model
       messages: [
         {
           role: 'system',
@@ -97,28 +78,38 @@ export async function POST(req: NextRequest) {
           content: input
         }
       ],
-      temperature: 0.5, // Reduced from 0.7 for more focused responses
-      max_tokens: 1000, // Reduced from 2000 since we don't need that many tokens
-      presence_penalty: 0.1, // Slight penalty to avoid repetition
-      frequency_penalty: 0.1 // Slight penalty to encourage diverse word choice
+      temperature: 0.3, // Lower temperature for more focused responses
+      max_tokens: 500, // Reduced token count
+      presence_penalty: 0.1,
+      frequency_penalty: 0.1,
+      stream: true // Enable streaming
     })
 
-    const generatedPrompt = response.choices[0]?.message?.content
-
-    if (!generatedPrompt) {
-      return NextResponse.json(
-        { error: 'No prompt was generated' },
-        { status: 500 }
-      )
+    // Process the stream
+    let fullPrompt = ''
+    for await (const chunk of response) {
+      const content = chunk.choices[0]?.delta?.content || ''
+      if (content) {
+        fullPrompt += content
+        await writer.write(encoder.encode(content))
+      }
     }
+    await writer.close()
 
     // Cache the result if Redis is available
-    if (redis) {
+    if (redis && fullPrompt) {
       const cacheKey = `super-prompt:${input}`
-      await redis.set(cacheKey, generatedPrompt, { ex: CACHE_TTL })
+      await redis.set(cacheKey, fullPrompt, { ex: CACHE_TTL })
     }
 
-    return NextResponse.json({ prompt: generatedPrompt })
+    // Return the stream
+    return new Response(stream.readable, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
   } catch (error) {
     console.error('Error generating super prompt:', error)
     return NextResponse.json(
