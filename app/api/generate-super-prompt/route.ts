@@ -108,8 +108,8 @@ export async function POST(req: NextRequest) {
           content: input
         }
       ],
-      temperature: 0.3,
-      max_tokens: 500,
+      temperature: 0.8,
+      max_tokens: 1500,
       presence_penalty: 0.1,
       frequency_penalty: 0.1,
       stream: true
