@@ -23,7 +23,7 @@
   list-style: none;
   padding: 8px;
   position: relative;
-  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
@@ -39,7 +39,13 @@
 .chatHistoryButton:hover {
   background-color: #f3f4f6;
   text-decoration: none;
-  transition-duration: 0.1s;
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.4);
+}
+
+.chatHistoryButton:active {
+  background-color: #edeff2;
+  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+  transform: translateY(1px);
 }
 
 .chatHistoryButton:disabled {
@@ -47,12 +53,7 @@
   border-color: rgba(27, 31, 35, 0.15);
   color: #959da5;
   cursor: default;
-}
-
-.chatHistoryButton:active {
-  background-color: #edeff2;
-  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
-  transition: none 0s;
+  box-shadow: none;
 }
 
 .chatHistoryButton:focus {
@@ -79,17 +80,18 @@
 
   .chatHistoryButton:hover {
     background-color: #374151;
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.6);
+  }
+
+  .chatHistoryButton:active {
+    background-color: #4b5563;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 1px 0 inset;
   }
 
   .chatHistoryButton:disabled {
     background-color: #1f2937;
     border-color: rgba(255, 255, 255, 0.1);
     color: #6b7280;
-  }
-
-  .chatHistoryButton:active {
-    background-color: #4b5563;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 1px 0 inset;
   }
 }
 
