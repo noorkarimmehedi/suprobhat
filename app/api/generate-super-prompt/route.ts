@@ -79,9 +79,14 @@ export async function POST(req: NextRequest) {
     // Try to get from cache first
     if (redis) {
       const cacheKey = `super-prompt:${input}`
-      const cachedPrompt = await redis.get(cacheKey)
+      const cachedPrompt = await redis.get<string>(cacheKey)
       if (cachedPrompt) {
-        return NextResponse.json({ prompt: cachedPrompt })
+        // Return cached prompt directly without JSON wrapping
+        return new Response(cachedPrompt, {
+          headers: {
+            'Content-Type': 'text/plain',
+          },
+        })
       }
     }
 
@@ -92,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     // Start the OpenAI request
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // Using GPT-3.5-turbo for faster responses
+      model: 'gpt-3.5-turbo',
       messages: [
         {
           role: 'system',
@@ -103,11 +108,11 @@ export async function POST(req: NextRequest) {
           content: input
         }
       ],
-      temperature: 0.3, // Lower temperature for more focused responses
-      max_tokens: 500, // Reduced token count for faster generation
+      temperature: 0.3,
+      max_tokens: 500,
       presence_penalty: 0.1,
       frequency_penalty: 0.1,
-      stream: true // Enable streaming
+      stream: true
     })
 
     // Process the stream
@@ -116,6 +121,7 @@ export async function POST(req: NextRequest) {
       const content = chunk.choices[0]?.delta?.content || ''
       if (content) {
         fullPrompt += content
+        // Write the content directly without JSON wrapping
         await writer.write(encoder.encode(content))
       }
     }
@@ -127,10 +133,10 @@ export async function POST(req: NextRequest) {
       await redis.set(cacheKey, fullPrompt, { ex: CACHE_TTL })
     }
 
-    // Return the stream
+    // Return the stream with text/plain content type
     return new Response(stream.readable, {
       headers: {
-        'Content-Type': 'text/event-stream',
+        'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
       },
