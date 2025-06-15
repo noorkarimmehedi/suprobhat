@@ -5,8 +5,8 @@ import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
 import { ArrowUp, ChevronDown, MessageCirclePlus, Sparkles, Square } from 'lucide-react'
-import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
+import OpenAI from 'openai'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
 import { toast } from 'sonner'
@@ -119,6 +119,11 @@ const GPT4_MODEL = {
   toolCallType: 'native'
 } as const
 
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true
+})
+
 export function ChatPanel({
   input,
   handleInputChange,
@@ -200,17 +205,13 @@ export function ChatPanel({
   const generateSuperPrompt = async (userInput: string) => {
     try {
       setIsGeneratingPrompt(true)
-      const chatId = nanoid()
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content: `You are a Prompt Generator, specializing in creating well-structured, verifiable, and low-hallucination prompts for any desired use case. Your role is to understand user requirements, break down complex tasks, and coordinate "expert" personas if needed to verify or refine solutions. You can ask clarifying questions when critical details are missing. Otherwise, minimize friction.
+
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a Prompt Generator, specializing in creating well-structured, verifiable, and low-hallucination prompts for any desired use case. Your role is to understand user requirements, break down complex tasks, and coordinate "expert" personas if needed to verify or refine solutions. You can ask clarifying questions when critical details are missing. Otherwise, minimize friction.
 
 Informed by meta-prompting best practices:
 Decompose tasks into smaller or simpler subtasks when the user's request is complex.
@@ -284,53 +285,19 @@ User Input
 Reply with the following introduction:
 "What is the topic or role of the prompt you want to create? Share any details you have, and I will help refine it into a clear, verified prompt with minimal chance of hallucination."
 Await user response. Ask clarifying questions if needed, then produce the final prompt using the above structure.`
-            },
-            {
-              role: 'user',
-              content: userInput
-            }
-          ],
-          model: GPT4_MODEL,
-          id: chatId
-        })
+          },
+          {
+            role: 'user',
+            content: userInput
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to generate super prompt')
-      }
+      const generatedPrompt = response.choices[0]?.message?.content
 
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('No response stream available')
-      }
-
-      let generatedPrompt = ''
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        // Convert the Uint8Array to a string
-        const chunk = new TextDecoder().decode(value)
-        const lines = chunk.split('\n')
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6)
-            if (data === '[DONE]') continue
-
-            try {
-              const parsed = JSON.parse(data)
-              if (parsed.choices?.[0]?.delta?.content) {
-                generatedPrompt += parsed.choices[0].delta.content
-              }
-            } catch (e) {
-              console.error('Error parsing chunk:', e)
-            }
-          }
-        }
-      }
-
-      if (generatedPrompt.trim().length === 0) {
+      if (!generatedPrompt) {
         throw new Error('No prompt was generated')
       }
 
