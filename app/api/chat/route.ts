@@ -13,8 +13,7 @@ const DEFAULT_MODEL: Model = {
   provider: 'OpenAI',
   providerId: 'openai',
   enabled: true,
-  toolCallType: 'native',
-  requiresAuth: false
+  toolCallType: 'native'
 }
 
 export async function POST(req: Request) {
