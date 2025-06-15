@@ -66,7 +66,8 @@ export async function handleStreamFinish({
       ...responseMessages.slice(-1)
     ] as ExtendedCoreMessage[]
 
-    if (process.env.ENABLE_SAVE_CHAT_HISTORY !== 'true') {
+    // Only save chat history if enabled and user is authenticated (not anonymous)
+    if (process.env.ENABLE_SAVE_CHAT_HISTORY !== 'true' || userId === 'anonymous') {
       return
     }
 

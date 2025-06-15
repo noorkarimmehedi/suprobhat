@@ -15,7 +15,8 @@ function getUserChatKey(userId: string) {
 }
 
 export async function getChats(userId?: string | null) {
-  if (!userId) {
+  // Return empty array if no userId or if user is anonymous
+  if (!userId || userId === 'anonymous') {
     return []
   }
 
