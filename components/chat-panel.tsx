@@ -1,5 +1,6 @@
 'use client'
 
+import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
@@ -8,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
 import { useArtifact } from './artifact/artifact-context'
+import { AuthPrompt } from './auth-prompt'
 import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
@@ -46,12 +48,21 @@ export function ChatPanel({
   scrollContainerRef
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const router = useRouter()
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const isFirstRender = useRef(true)
   const [isComposing, setIsComposing] = useState(false) // Composition state
   const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
   const { close: closeArtifact } = useArtifact()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await getCurrentUser()
+      setIsAuthenticated(!!user)
+    }
+    checkAuth()
+  }, [])
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -107,6 +118,52 @@ export function ChatPanel({
     }
   }
 
+  const renderInput = () => (
+    <Textarea
+      ref={inputRef}
+      name="input"
+      rows={2}
+      maxRows={5}
+      tabIndex={0}
+      onCompositionStart={handleCompositionStart}
+      onCompositionEnd={handleCompositionEnd}
+      placeholder="Ask a question..."
+      spellCheck={false}
+      value={input}
+      disabled={isLoading || isToolInvocationInProgress()}
+      className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      onChange={e => {
+        handleInputChange(e)
+        setShowEmptyScreen(e.target.value.length === 0)
+      }}
+      onKeyDown={e => {
+        if (
+          e.key === 'Enter' &&
+          !e.shiftKey &&
+          !isComposing &&
+          !enterDisabled
+        ) {
+          if (input.trim().length === 0) {
+            e.preventDefault()
+            return
+          }
+          e.preventDefault()
+          const textarea = e.target as HTMLTextAreaElement
+          textarea.form?.requestSubmit()
+        }
+      }}
+      onFocus={() => setShowEmptyScreen(true)}
+      onBlur={() => setShowEmptyScreen(false)}
+    />
+  )
+
+  const renderModelSelector = () => (
+    <div className="flex items-center gap-2">
+      <ModelSelector models={models || []} />
+      <SearchModeToggle />
+    </div>
+  )
+
   return (
     <div
       className={cn(
@@ -127,52 +184,30 @@ export function ChatPanel({
             className={cn('max-w-3xl w-full mx-auto relative')}
           >
             <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
-              <Textarea
-                ref={inputRef}
-                name="input"
-                rows={2}
-                maxRows={5}
-                tabIndex={0}
-                onCompositionStart={handleCompositionStart}
-                onCompositionEnd={handleCompositionEnd}
-                placeholder="Ask a question..."
-                spellCheck={false}
-                value={input}
-                disabled={isLoading || isToolInvocationInProgress()}
-                className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                onChange={e => {
-                  handleInputChange(e)
-                  setShowEmptyScreen(e.target.value.length === 0)
-                }}
-                onKeyDown={e => {
-                  if (
-                    e.key === 'Enter' &&
-                    !e.shiftKey &&
-                    !isComposing &&
-                    !enterDisabled
-                  ) {
-                    if (input.trim().length === 0) {
-                      e.preventDefault()
-                      return
-                    }
-                    e.preventDefault()
-                    const textarea = e.target as HTMLTextAreaElement
-                    textarea.form?.requestSubmit()
-                  }
-                }}
-                onFocus={() => setShowEmptyScreen(true)}
-                onBlur={() => setShowEmptyScreen(false)}
-              />
+              {isAuthenticated ? (
+                renderInput()
+              ) : (
+                <AuthPrompt trigger={renderInput()}>
+                  <div className="p-4 text-sm text-muted-foreground">
+                    Sign in to start chatting
+                  </div>
+                </AuthPrompt>
+              )}
               <div className="flex items-center justify-between p-3">
-                <div className="flex items-center gap-2">
-                  <ModelSelector models={models || []} />
-                  <SearchModeToggle />
-                </div>
+                {isAuthenticated ? (
+                  renderModelSelector()
+                ) : (
+                  <AuthPrompt trigger={renderModelSelector()}>
+                    <div className="text-sm text-muted-foreground">
+                      Sign in to select a model
+                    </div>
+                  </AuthPrompt>
+                )}
                 <div className="flex items-center gap-2">
                   <Button
                     type="submit"
                     size="icon"
-                    disabled={isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
+                    disabled={!isAuthenticated || isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
                     className="shrink-0 rounded-full"
                   >
                     <ArrowUp className="size-4" />
@@ -213,49 +248,27 @@ export function ChatPanel({
           )}
 
           <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
-            <Textarea
-              ref={inputRef}
-              name="input"
-              rows={2}
-              maxRows={5}
-              tabIndex={0}
-              onCompositionStart={handleCompositionStart}
-              onCompositionEnd={handleCompositionEnd}
-              placeholder="Ask a question..."
-              spellCheck={false}
-              value={input}
-              disabled={isLoading || isToolInvocationInProgress()}
-              className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              onChange={e => {
-                handleInputChange(e)
-                setShowEmptyScreen(e.target.value.length === 0)
-              }}
-              onKeyDown={e => {
-                if (
-                  e.key === 'Enter' &&
-                  !e.shiftKey &&
-                  !isComposing &&
-                  !enterDisabled
-                ) {
-                  if (input.trim().length === 0) {
-                    e.preventDefault()
-                    return
-                  }
-                  e.preventDefault()
-                  const textarea = e.target as HTMLTextAreaElement
-                  textarea.form?.requestSubmit()
-                }
-              }}
-              onFocus={() => setShowEmptyScreen(true)}
-              onBlur={() => setShowEmptyScreen(false)}
-            />
+            {isAuthenticated ? (
+              renderInput()
+            ) : (
+              <AuthPrompt trigger={renderInput()}>
+                <div className="p-4 text-sm text-muted-foreground">
+                  Sign in to continue chatting
+                </div>
+              </AuthPrompt>
+            )}
 
             {/* Bottom menu area */}
             <div className="flex items-center justify-between p-3">
-              <div className="flex items-center gap-2">
-                <ModelSelector models={models || []} />
-                <SearchModeToggle />
-              </div>
+              {isAuthenticated ? (
+                renderModelSelector()
+              ) : (
+                <AuthPrompt trigger={renderModelSelector()}>
+                  <div className="text-sm text-muted-foreground">
+                    Sign in to select a model
+                  </div>
+                </AuthPrompt>
+              )}
               <div className="flex items-center gap-2">
                 {messages.length > 0 && (
                   <Button
@@ -275,6 +288,7 @@ export function ChatPanel({
                   variant={'outline'}
                   className={cn(isLoading && 'animate-pulse', 'rounded-full')}
                   disabled={
+                    !isAuthenticated ||
                     (input.length === 0 && !isLoading) ||
                     isToolInvocationInProgress()
                   }

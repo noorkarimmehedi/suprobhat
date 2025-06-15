@@ -1,4 +1,3 @@
-import { AuthRequired } from '@/components/auth-required'
 import { Chat } from '@/components/chat'
 import { getChat } from '@/lib/actions/chat'
 import { getCurrentUserId } from '@/lib/auth/get-current-user'
@@ -38,9 +37,5 @@ export default async function SearchPage(props: {
   }
 
   const models = await getModels()
-  return (
-    <AuthRequired>
-      <Chat id={id} savedMessages={messages} models={models} />
-    </AuthRequired>
-  )
+  return <Chat id={id} savedMessages={messages} models={models} />
 }
