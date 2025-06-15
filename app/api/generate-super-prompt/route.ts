@@ -66,6 +66,9 @@ Your task is to:
 4. Do not include any explanations, meta-commentary, or additional formatting`
 
 export async function POST(req: NextRequest) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 25000) // 25 second timeout
+
   try {
     const { input } = await req.json()
 
@@ -81,7 +84,6 @@ export async function POST(req: NextRequest) {
       const cacheKey = `super-prompt:${input}`
       const cachedPrompt = await redis.get<string>(cacheKey)
       if (cachedPrompt) {
-        // Return cached prompt directly without JSON wrapping
         return new Response(cachedPrompt, {
           headers: {
             'Content-Type': 'text/plain',
@@ -95,7 +97,7 @@ export async function POST(req: NextRequest) {
     const stream = new TransformStream()
     const writer = stream.writable.getWriter()
 
-    // Start the OpenAI request
+    // Start the OpenAI request with timeout
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
@@ -113,39 +115,71 @@ export async function POST(req: NextRequest) {
       presence_penalty: 0.1,
       frequency_penalty: 0.1,
       stream: true
+    }, {
+      signal: controller.signal,
+      timeout: 20000 // 20 second timeout for the OpenAI request
     })
 
-    // Process the stream
     let fullPrompt = ''
-    for await (const chunk of response) {
-      const content = chunk.choices[0]?.delta?.content || ''
-      if (content) {
-        fullPrompt += content
-        // Write the content directly without JSON wrapping
-        await writer.write(encoder.encode(content))
+    let hasContent = false
+
+    try {
+      // Process the stream with timeout
+      for await (const chunk of response) {
+        const content = chunk.choices[0]?.delta?.content || ''
+        if (content) {
+          hasContent = true
+          fullPrompt += content
+          await writer.write(encoder.encode(content))
+        }
       }
-    }
-    await writer.close()
 
-    // Cache the result if Redis is available
-    if (redis && fullPrompt) {
-      const cacheKey = `super-prompt:${input}`
-      await redis.set(cacheKey, fullPrompt, { ex: CACHE_TTL })
-    }
+      if (!hasContent) {
+        throw new Error('No content generated')
+      }
 
-    // Return the stream with text/plain content type
-    return new Response(stream.readable, {
-      headers: {
-        'Content-Type': 'text/plain',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    })
-  } catch (error) {
+      await writer.close()
+
+      // Cache the result if Redis is available
+      if (redis && fullPrompt) {
+        const cacheKey = `super-prompt:${input}`
+        await redis.set(cacheKey, fullPrompt, { ex: CACHE_TTL })
+      }
+
+      // Return the stream
+      return new Response(stream.readable, {
+        headers: {
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      })
+    } catch (streamError) {
+      console.error('Stream processing error:', streamError)
+      await writer.abort(streamError)
+      throw streamError
+    }
+  } catch (error: any) {
     console.error('Error generating super prompt:', error)
+    
+    // Handle specific error types
+    if (error?.name === 'AbortError') {
+      return NextResponse.json(
+        { error: 'Request timed out. Please try again.' },
+        { status: 408 }
+      )
+    } else if (error?.name === 'OpenAIError') {
+      return NextResponse.json(
+        { error: 'Failed to generate prompt. Please try again.' },
+        { status: 500 }
+      )
+    }
+
     return NextResponse.json(
-      { error: 'Failed to generate super prompt' },
+      { error: 'An unexpected error occurred. Please try again.' },
       { status: 500 }
     )
+  } finally {
+    clearTimeout(timeoutId)
   }
 } 
