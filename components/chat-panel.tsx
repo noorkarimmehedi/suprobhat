@@ -200,8 +200,14 @@ export function ChatPanel({
     try {
       setIsGeneratingPrompt(true)
       let promptText = ''
+      let hasReceivedContent = false
 
-      const response = await fetch('/api/generate-super-prompt', {
+      // Set a timeout to handle long-running requests
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), 25000)
+      })
+
+      const responsePromise = fetch('/api/generate-super-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -209,8 +215,12 @@ export function ChatPanel({
         body: JSON.stringify({ input: userInput }),
       })
 
+      // Race between the fetch and timeout
+      const response = await Promise.race([responsePromise, timeoutPromise]) as Response
+
       if (!response.ok) {
-        throw new Error('Failed to generate super prompt')
+        const errorData = await response.json().catch(() => ({})) as { error?: string }
+        throw new Error(errorData.error || 'Failed to generate super prompt')
       }
 
       if (!response.body) {
@@ -220,27 +230,55 @@ export function ChatPanel({
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          
+          if (done) {
+            if (!hasReceivedContent) {
+              throw new Error('No content was generated')
+            }
+            break
+          }
 
-        const chunk = decoder.decode(value)
-        promptText += chunk
+          const chunk = decoder.decode(value)
+          if (chunk) {
+            hasReceivedContent = true
+            promptText += chunk
 
-        // Update the input field with the streaming text
-        handleInputChange({
-          target: { value: promptText }
-        } as React.ChangeEvent<HTMLTextAreaElement>)
+            // Update the input field with the streaming text
+            handleInputChange({
+              target: { value: promptText }
+            } as React.ChangeEvent<HTMLTextAreaElement>)
+          }
+        }
+
+        if (promptText.trim()) {
+          toast.success('Super prompt generated!')
+        } else {
+          throw new Error('Generated prompt is empty')
+        }
+      } catch (streamError) {
+        console.error('Stream processing error:', streamError)
+        throw streamError
+      } finally {
+        reader.releaseLock()
       }
-
-      if (!promptText) {
-        throw new Error('No prompt was generated')
-      }
-
-      toast.success('Super prompt generated!')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating super prompt:', error)
-      toast.error('Failed to generate super prompt')
+      // Reset the input if there was an error
+      handleInputChange({
+        target: { value: userInput }
+      } as React.ChangeEvent<HTMLTextAreaElement>)
+      
+      // Show appropriate error message
+      if (error?.message === 'Request timed out') {
+        toast.error('Request timed out. Please try again.')
+      } else if (error?.message === 'No content was generated') {
+        toast.error('No prompt was generated. Please try again.')
+      } else {
+        toast.error(error?.message || 'Failed to generate super prompt')
+      }
     } finally {
       setIsGeneratingPrompt(false)
     }
@@ -249,6 +287,10 @@ export function ChatPanel({
   const handleCraftSuperPrompt = () => {
     if (input.trim().length === 0) {
       toast.error('Please enter some text first')
+      return
+    }
+    if (isGeneratingPrompt) {
+      toast.error('Already generating a prompt')
       return
     }
     generateSuperPrompt(input)
