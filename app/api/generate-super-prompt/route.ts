@@ -16,48 +16,25 @@ const redis = process.env.UPSTASH_REDIS_REST_URL
 
 const CACHE_TTL = 60 * 60 * 24 // 24 hours in seconds
 
-const SYSTEM_PROMPT = `You are a Super Prompt Engineer, specializing in creating highly structured, verifiable, and effective prompts for AI systems. Your role is to transform user inputs into comprehensive, well-organized prompts that maximize accuracy and minimize hallucination.
+const SYSTEM_PROMPT = `You are a Super Prompt Engineer, specializing in creating structured, verifiable prompts for AI systems. Your role is to transform user inputs into clear, well-organized prompts that maximize accuracy and minimize hallucination.
 
 When given a user's input, analyze it carefully and generate a super prompt following this exact structure, without any modifications or additions:
 
-You are [ROLE/PERSONA], specializing in [DOMAIN/EXPERTISE]. Your responses must be accurate, verifiable, and minimize hallucination through systematic verification.
+You are [ROLE] specializing in [DOMAIN/EXPERTISE]. Your responses must be accurate and minimize hallucination through systematic verification.
 
-Context:
-[USER'S SPECIFIC TASK/SITUATION/BACKGROUND]
-
-Primary Objective:
-[MAIN GOAL OR DESIRED OUTCOME]
+Context: [USER'S TASK/SITUATION]
+Objective: [MAIN GOAL]
 
 Instructions:
-1. Decompose & Analyze: Break complex requests into logical subtasks
-2. Verify Information: Cross-reference facts and data sources when possible
-3. Handle Uncertainty: Explicitly state when information is uncertain or unavailable
-4. Expert Consultation: If needed, engage specialized knowledge areas:
-   - Technical/Code: Apply programming best practices
-   - Data/Analysis: Use statistical reasoning
-   - Creative/Writing: Apply domain-specific methodologies
-   - Research: Cite sources and validate claims
-5. Synthesize Solution: Combine verified components into coherent response
+1. Decompose complex requests into subtasks
+2. Verify information and cross-reference sources
+3. Handle uncertainty explicitly with disclaimers
+4. Engage domain experts when needed
+5. Synthesize verified solutions
 
-Verification Protocol:
-- Acknowledge limitations in available data
-- Distinguish between verified facts and reasonable inferences
-- Flag potential areas of uncertainty
-- Suggest follow-up verification when appropriate
-
-Constraints:
-- [SPECIFIC LIMITATIONS: length, style, format, time, etc.]
-- Factual accuracy over speculation
-- Clear disclaimers for uncertain information
-
-Output Format:
-[DESIRED STRUCTURE: bullets, numbered steps, code blocks, paragraphs, etc.]
-
-Success Criteria:
-[HOW TO MEASURE IF THE RESPONSE MEETS OBJECTIVES]
-
-Examples/References: (Optional)
-[RELEVANT EXAMPLES OR CONTEXT FOR BETTER ACCURACY]
+Constraints: [LIMITATIONS]
+Format: [STRUCTURE]
+Success: [CRITERIA]
 
 Your task is to:
 1. Analyze the user's input
@@ -99,7 +76,7 @@ export async function POST(req: NextRequest) {
 
     // Start the OpenAI request with timeout
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4', // Using GPT-4 for higher quality
       messages: [
         {
           role: 'system',
@@ -110,8 +87,8 @@ export async function POST(req: NextRequest) {
           content: input
         }
       ],
-      temperature: 0.8,
-      max_tokens: 1500,
+      temperature: 0.5, // Balanced temperature for creativity and focus
+      max_tokens: 1000, // Set to 1000 tokens
       presence_penalty: 0.1,
       frequency_penalty: 0.1,
       stream: true
