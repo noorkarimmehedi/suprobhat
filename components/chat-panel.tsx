@@ -12,7 +12,7 @@ import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
 import { Button } from './ui/button'
-import { IconLogo } from './ui/icons'
+import { TextHoverEffect } from './ui/hover-text-effect'
 
 interface ChatPanelProps {
   input: string
@@ -116,10 +116,12 @@ export function ChatPanel({
     >
       {messages.length === 0 && (
         <div className="mb-10 flex flex-col items-center gap-4">
-          <IconLogo className="size-12 text-muted-foreground" />
-          <p className="text-center text-3xl font-semibold">
-            How can I help you today?
-          </p>
+          <div className="w-[300px] h-[100px]">
+            <TextHoverEffect 
+              text="You are given a task to integrate an existing React component in the codebase" 
+              duration={0.3}
+            />
+          </div>
         </div>
       )}
       <form
