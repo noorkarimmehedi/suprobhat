@@ -1,9 +1,9 @@
 import { Chat } from '@/components/chat'
 import { getModels } from '@/lib/config/models'
-import { generateId } from 'ai'
 
-export default async function Page() {
-  const id = generateId()
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
   const models = await getModels()
-  return <Chat id={id} models={models} />
+  return <Chat id="new" models={models} />
 }

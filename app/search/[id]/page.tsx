@@ -5,6 +5,7 @@ import { getModels } from '@/lib/config/models'
 import { convertToUIMessages } from '@/lib/utils'
 import { notFound, redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 export async function generateMetadata(props: {
