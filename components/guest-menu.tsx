@@ -13,8 +13,7 @@ import {
 import {
     Link2,
     LogIn,
-    Palette,
-    Settings2
+    Palette
 } from 'lucide-react'
 import Link from 'next/link'
 import { ExternalLinkItems } from './external-link-items'
@@ -25,8 +24,7 @@ export default function GuestMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={styles.settingsButton}>
-          <Settings2 className={styles.icon} />
+        <button className={styles.settingsButton} aria-label="Open menu">
           <span className="sr-only">Open menu</span>
         </button>
       </DropdownMenuTrigger>
