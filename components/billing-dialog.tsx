@@ -3,8 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { Check } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 const plans = [
   {
@@ -60,9 +63,51 @@ interface BillingDialogProps {
 }
 
 export function BillingDialog({ open, onOpenChange }: BillingDialogProps) {
+  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const supabase = createClient()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+    }
+    checkAuth()
+  }, [supabase.auth])
+
+  const handlePlanClick = async () => {
+    if (!isAuthenticated) {
+      onOpenChange(false) // Close the dialog first
+      router.push('/auth/login')
+    } else {
+      // Handle authenticated user plan selection
+      // You can add your subscription logic here
+      onOpenChange(false)
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+    <Dialog 
+      open={open} 
+      onOpenChange={(newOpen) => {
+        // Ensure the dialog state is properly updated
+        if (!newOpen) {
+          // Add a small delay before closing to prevent menu issues
+          setTimeout(() => {
+            onOpenChange(false)
+          }, 100)
+        } else {
+          onOpenChange(true)
+        }
+      }}
+    >
+      <DialogContent 
+        className="max-w-7xl max-h-[90vh] overflow-y-auto"
+        onInteractOutside={(e) => {
+          // Prevent closing when clicking outside
+          e.preventDefault()
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-3xl font-bold text-center">
             Simple, transparent pricing
@@ -110,9 +155,9 @@ export function BillingDialog({ open, onOpenChange }: BillingDialogProps) {
                 <Button
                   className="w-full"
                   variant={plan.popular ? 'default' : 'outline'}
-                  onClick={() => onOpenChange(false)}
+                  onClick={handlePlanClick}
                 >
-                  {plan.buttonText}
+                  {isAuthenticated ? plan.buttonText : 'Sign in to Subscribe'}
                 </Button>
               </CardFooter>
             </Card>

@@ -16,7 +16,7 @@ import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { CreditCard, Link2, LogOut, Palette } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { BillingDialog } from './billing-dialog'
 import { ExternalLinkItems } from './external-link-items'
 import { ThemeMenuItems } from './theme-menu-items'
@@ -29,6 +29,7 @@ interface UserMenuProps {
 export default function UserMenu({ user }: UserMenuProps) {
   const router = useRouter()
   const [showBillingDialog, setShowBillingDialog] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const userName =
     user.user_metadata?.full_name || user.user_metadata?.name || 'User'
   const avatarUrl =
@@ -55,9 +56,14 @@ export default function UserMenu({ user }: UserMenuProps) {
     router.refresh()
   }
 
+  const handleBillingClick = useCallback(() => {
+    setIsMenuOpen(false) // Close the menu first
+    setShowBillingDialog(true)
+  }, [])
+
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <button 
             className={styles.userAvatarButton} 
@@ -102,7 +108,7 @@ export default function UserMenu({ user }: UserMenuProps) {
             </DropdownMenuSubContent>
           </DropdownMenuSub>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowBillingDialog(true)}>
+          <DropdownMenuItem onClick={handleBillingClick}>
             <CreditCard className="mr-2 h-4 w-4" />
             <span>Billing</span>
           </DropdownMenuItem>

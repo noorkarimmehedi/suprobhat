@@ -17,7 +17,7 @@ import {
     Palette
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { BillingDialog } from './billing-dialog'
 import { ExternalLinkItems } from './external-link-items'
 import { ThemeMenuItems } from './theme-menu-items'
@@ -25,10 +25,16 @@ import styles from './ui/settings-button.module.css'
 
 export default function GuestMenu() {
   const [showBillingDialog, setShowBillingDialog] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const handleBillingClick = useCallback(() => {
+    setIsMenuOpen(false) // Close the menu first
+    setShowBillingDialog(true)
+  }, [])
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <button className={styles.settingsButton} aria-label="Open menu">
             <span className="sr-only">Open menu</span>
@@ -42,7 +48,7 @@ export default function GuestMenu() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowBillingDialog(true)}>
+          <DropdownMenuItem onClick={handleBillingClick}>
             <CreditCard className="mr-2 h-4 w-4" />
             <span>Billing</span>
           </DropdownMenuItem>
