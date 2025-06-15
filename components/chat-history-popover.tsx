@@ -23,6 +23,15 @@ export function ChatHistoryPopover() {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
+  // Prefetch chat routes when chats are loaded
+  useEffect(() => {
+    if (chats.length > 0) {
+      chats.forEach(chat => {
+        router.prefetch(`/search/${chat.id}`)
+      })
+    }
+  }, [chats, router])
+
   const fetchChats = async () => {
     try {
       const response = await fetch('/api/chats?offset=0&limit=50')
@@ -145,7 +154,7 @@ export function ChatHistoryPopover() {
                   <li key={chat.id} className="group">
                     <button
                       onClick={() => {
-                        router.push(`/search/${chat.id}`)
+                        router.replace(`/search/${chat.id}`)
                         setIsOpen(false)
                       }}
                       className="w-full px-4 py-3 text-left hover:bg-accent hover:text-accent-foreground transition-colors"

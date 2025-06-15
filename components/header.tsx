@@ -15,10 +15,29 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ user }) => {
   const router = useRouter()
 
-  // Prefetch the home route for instant navigation
+  // Prefetch routes for better navigation performance
   useEffect(() => {
+    // Prefetch home route
     router.prefetch('/')
-  }, [router])
+    
+    // If user is logged in, prefetch chat routes
+    if (user) {
+      // Prefetch the first few chat routes
+      const prefetchChatRoutes = async () => {
+        try {
+          const response = await fetch('/api/chats?offset=0&limit=5')
+          if (!response.ok) return
+          const data = await response.json()
+          data.chats.forEach((chat: { id: string }) => {
+            router.prefetch(`/search/${chat.id}`)
+          })
+        } catch (error) {
+          console.error('Error prefetching chat routes:', error)
+        }
+      }
+      prefetchChatRoutes()
+    }
+  }, [router, user])
 
   const handleNewChat = () => {
     // Clear any existing chat state from localStorage
