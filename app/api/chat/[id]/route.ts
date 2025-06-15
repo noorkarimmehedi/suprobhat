@@ -6,7 +6,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const enableSaveChatHistory = process.env.ENABLE_SAVE_CHAT_HISTORY === 'true'
+  const enableSaveChatHistory = process.env.NEXT_PUBLIC_ENABLE_SAVE_CHAT_HISTORY === 'true'
   if (!enableSaveChatHistory) {
     return NextResponse.json(
       { error: 'Chat history saving is disabled.' },
