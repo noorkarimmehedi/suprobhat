@@ -2,24 +2,20 @@
 
 import { ChatHistoryPopover } from '@/components/chat-history-popover'
 import GuestMenu from '@/components/guest-menu'
+import styles from '@/components/ui/plus-button.module.css'
 import UserMenu from '@/components/user-menu'
-import { cn } from '@/lib/utils'
+import { User } from '@supabase/supabase-js'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import styles from './ui/plus-button.module.css'
+import { useTransition } from 'react'
 
 interface HeaderProps {
-  user: any
+  user?: User
 }
 
-export const Header: React.FC<HeaderProps> = ({ user }) => {
+export function Header({ user }: HeaderProps) {
   const router = useRouter()
-
-  // Prefetch the home route for instant navigation
-  useEffect(() => {
-    router.prefetch('/')
-  }, [router])
+  const [isPending, startTransition] = useTransition()
 
   const handleNewChat = () => {
     // Clear any existing chat state from localStorage
@@ -31,37 +27,35 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
     // Update chat history
     window.dispatchEvent(new CustomEvent('chat-history-updated'))
     
-    // Navigate to home
-    router.replace('/')
+    startTransition(() => {
+      router.push('/')
+    })
   }
 
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
-        'px-4 py-2'
-      )}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <button 
-            className={styles.plusButton}
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 flex">
+          <button
             onClick={handleNewChat}
-            title="New Chat"
-            type="button"
+            className={styles.plusButton}
+            disabled={isPending}
+            aria-label="New Chat"
           >
             <Plus className={styles.icon} />
-            <span className="sr-only">New Chat</span>
           </button>
+          <div className="ml-2">
+            <ChatHistoryPopover />
+          </div>
         </div>
-
-        <div className="flex items-center gap-4">
-          <ChatHistoryPopover />
-          {user ? <UserMenu user={user} /> : <GuestMenu />}
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <div className="flex items-center gap-4">
+              {user ? <UserMenu user={user} /> : <GuestMenu />}
+            </div>
+          </div>
         </div>
       </div>
     </header>
   )
 }
-
-export default Header
