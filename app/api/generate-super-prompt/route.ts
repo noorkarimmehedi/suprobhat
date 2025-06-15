@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
 
     // Start the OpenAI request
     const response = await openai.chat.completions.create({
-      model: 'gpt-4', // Using GPT-4 for higher quality
+      model: 'gpt-3.5-turbo', // Using GPT-3.5-turbo for faster responses
       messages: [
         {
           role: 'system',
@@ -103,8 +103,8 @@ export async function POST(req: NextRequest) {
           content: input
         }
       ],
-      temperature: 0.5, // Balanced temperature for creativity and focus
-      max_tokens: 1000, // Keeping max tokens at 1000
+      temperature: 0.3, // Lower temperature for more focused responses
+      max_tokens: 500, // Reduced token count for faster generation
       presence_penalty: 0.1,
       frequency_penalty: 0.1,
       stream: true // Enable streaming
