@@ -55,7 +55,12 @@ export default function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={styles.userAvatarButton} type="button" aria-label="User menu">
+        <button 
+          className={styles.userAvatarButton} 
+          type="button" 
+          aria-label="User menu"
+          title={userName}
+        >
           <Avatar className={styles.avatar}>
             <AvatarImage src={avatarUrl} alt={userName} />
             <AvatarFallback>{getInitials(userName, user.email)}</AvatarFallback>

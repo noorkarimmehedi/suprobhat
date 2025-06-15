@@ -1,9 +1,9 @@
 /* User Avatar Button Styles */
 .userAvatarButton {
   appearance: none;
-  background-color: transparent;
+  background-color: var(--background);
   border: 1px solid rgba(27, 31, 35, 0.15);
-  border-radius: 50%;
+  border-radius: 6px;
   box-shadow:
     rgba(27, 31, 35, 0.04) 0 1px 0,
     rgba(255, 255, 255, 0.25) 0 1px 0 inset;
@@ -12,7 +12,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 8px;
   position: relative;
   transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;
@@ -47,10 +47,18 @@
   outline-offset: 2px;
 }
 
+.userAvatarButton:before {
+  display: none;
+}
+
+.userAvatarButton:-webkit-details-marker {
+  display: none;
+}
+
 .avatar {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 4px;
   overflow: hidden;
   display: flex;
   align-items: center;
