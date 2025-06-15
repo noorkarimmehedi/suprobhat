@@ -62,43 +62,4 @@
 
 .userAvatarButton:-webkit-details-marker {
   display: none;
-}
-
-/* Dark mode styles */
-@media (prefers-color-scheme: dark) {
-  .userAvatarButton {
-    background-color: #1f2937;
-    background-image: url('https://img.icons8.com/?size=100&id=15265&format=png&color=FFFFFF');
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow:
-      rgba(0, 0, 0, 0.1) 0 1px 0,
-      rgba(255, 255, 255, 0.05) 0 1px 0 inset;
-  }
-
-  .userAvatarButton:hover {
-    background-color: #374151;
-  }
-
-  .userAvatarButton:active {
-    background-color: #4b5563;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 1px 0 inset;
-  }
-
-  .userAvatarButton:disabled {
-    background-color: #1f2937;
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #6b7280;
-  }
-}
-
-.avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  transition: transform 0.2s ease;
-  object-fit: cover;
-}
-
-.userAvatarButton:hover .avatar {
-  transform: scale(1.1);
 } 
