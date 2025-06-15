@@ -6,7 +6,7 @@ import UserMenu from '@/components/user-menu'
 import { cn } from '@/lib/utils'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
+import { useEffect } from 'react'
 import { Button } from './ui/button'
 
 interface HeaderProps {
@@ -15,12 +15,15 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ user }) => {
   const router = useRouter()
-  const [isPending, startTransition] = useTransition()
+
+  // Prefetch the home route for instant navigation
+  useEffect(() => {
+    router.prefetch('/')
+  }, [router])
 
   const handleNewChat = () => {
-    startTransition(() => {
-      router.push('/')
-    })
+    // Use replace instead of push for faster navigation
+    router.replace('/')
   }
 
   return (
@@ -35,12 +38,8 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className={cn(
-              "size-8 mr-2",
-              isPending && "opacity-50"
-            )}
+            className="size-8 mr-2 hover:bg-accent hover:text-accent-foreground transition-colors"
             onClick={handleNewChat}
-            disabled={isPending}
             title="New Chat"
           >
             <Plus className="size-5" />
