@@ -1,6 +1,7 @@
+import { useCurrentUserImage } from '@/hooks/use-current-user-image'
 import { cn } from '@/lib/utils'
 import { ChevronDown } from 'lucide-react'
-import { CurrentUserAvatar } from './current-user-avatar'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
   Collapsible,
   CollapsibleContent,
@@ -31,6 +32,7 @@ export function CollapsibleMessage({
   showIcon = true
 }: CollapsibleMessageProps) {
   const content = <div className="flex-1">{children}</div>
+  const userImage = useCurrentUserImage()
 
   return (
     <div className="flex">
@@ -40,7 +42,10 @@ export function CollapsibleMessage({
             {role === 'assistant' ? (
               <IconLogo className="size-5" />
             ) : (
-              <CurrentUserAvatar />
+              <Avatar className="size-5">
+                <AvatarImage src={userImage || undefined} alt="User" />
+                <AvatarFallback className="text-[10px]">U</AvatarFallback>
+              </Avatar>
             )}
           </div>
         </div>
