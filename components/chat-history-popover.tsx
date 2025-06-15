@@ -44,6 +44,18 @@ export function ChatHistoryPopover() {
     }
   }, [isOpen])
 
+  // Add event listener for chat history updates
+  useEffect(() => {
+    const handleChatHistoryUpdate = () => {
+      fetchChats()
+    }
+
+    window.addEventListener('chat-history-updated', handleChatHistoryUpdate)
+    return () => {
+      window.removeEventListener('chat-history-updated', handleChatHistoryUpdate)
+    }
+  }, [])
+
   useEffect(() => {
     const filtered = chats.filter(chat =>
       chat.title.toLowerCase().includes(searchQuery.toLowerCase())
