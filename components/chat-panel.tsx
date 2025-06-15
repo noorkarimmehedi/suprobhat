@@ -114,119 +114,190 @@ export function ChatPanel({
         messages.length > 0 ? 'sticky bottom-0 px-2 pb-4' : 'px-6'
       )}
     >
-      {messages.length === 0 && (
-        <div className="mb-10 flex flex-col items-center gap-4">
+      {messages.length === 0 ? (
+        <div className="flex flex-col items-center justify-center flex-1 max-w-3xl w-full mx-auto gap-2">
           <div className="max-w-3xl w-full h-[250px]">
-            <TextHoverEffect 
-              text="Arc Lab" 
-              duration={0.3}
+            <TextHoverEffect
+              text="You are given a task to integrate an existing React component in the codebase"
+              duration={0.5}
             />
           </div>
-        </div>
-      )}
-      <form
-        onSubmit={handleSubmit}
-        className={cn('max-w-3xl w-full mx-auto relative')}
-      >
-        {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
-        {showScrollToBottomButton && messages.length > 0 && (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="absolute -top-10 right-4 z-20 size-8 rounded-full shadow-md"
-            onClick={handleScrollToBottom}
-            title="Scroll to bottom"
+          <form
+            onSubmit={handleSubmit}
+            className={cn('max-w-3xl w-full mx-auto relative')}
           >
-            <ChevronDown size={16} />
-          </Button>
-        )}
-
-        <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
-          <Textarea
-            ref={inputRef}
-            name="input"
-            rows={2}
-            maxRows={5}
-            tabIndex={0}
-            onCompositionStart={handleCompositionStart}
-            onCompositionEnd={handleCompositionEnd}
-            placeholder="Ask a question..."
-            spellCheck={false}
-            value={input}
-            disabled={isLoading || isToolInvocationInProgress()}
-            className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            onChange={e => {
-              handleInputChange(e)
-              setShowEmptyScreen(e.target.value.length === 0)
-            }}
-            onKeyDown={e => {
-              if (
-                e.key === 'Enter' &&
-                !e.shiftKey &&
-                !isComposing &&
-                !enterDisabled
-              ) {
-                if (input.trim().length === 0) {
-                  e.preventDefault()
-                  return
-                }
-                e.preventDefault()
-                const textarea = e.target as HTMLTextAreaElement
-                textarea.form?.requestSubmit()
-              }
-            }}
-            onFocus={() => setShowEmptyScreen(true)}
-            onBlur={() => setShowEmptyScreen(false)}
-          />
-
-          {/* Bottom menu area */}
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center gap-2">
-              <ModelSelector models={models || []} />
-              <SearchModeToggle />
+            <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
+              <Textarea
+                ref={inputRef}
+                name="input"
+                rows={2}
+                maxRows={5}
+                tabIndex={0}
+                onCompositionStart={handleCompositionStart}
+                onCompositionEnd={handleCompositionEnd}
+                placeholder="Ask a question..."
+                spellCheck={false}
+                value={input}
+                disabled={isLoading || isToolInvocationInProgress()}
+                className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                onChange={e => {
+                  handleInputChange(e)
+                  setShowEmptyScreen(e.target.value.length === 0)
+                }}
+                onKeyDown={e => {
+                  if (
+                    e.key === 'Enter' &&
+                    !e.shiftKey &&
+                    !isComposing &&
+                    !enterDisabled
+                  ) {
+                    if (input.trim().length === 0) {
+                      e.preventDefault()
+                      return
+                    }
+                    e.preventDefault()
+                    const textarea = e.target as HTMLTextAreaElement
+                    textarea.form?.requestSubmit()
+                  }
+                }}
+                onFocus={() => setShowEmptyScreen(true)}
+                onBlur={() => setShowEmptyScreen(false)}
+              />
+              <div className="flex items-center justify-between p-3">
+                <div className="flex items-center gap-2">
+                  <ModelSelector models={models || []} />
+                  <SearchModeToggle />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
+                    className="shrink-0 rounded-full"
+                  >
+                    <ArrowUp className="size-4" />
+                  </Button>
+                  {isLoading && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={stop}
+                      className="shrink-0 rounded-full"
+                    >
+                      <Square className="size-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              {messages.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleNewChat}
-                  className="shrink-0 rounded-full group"
-                  type="button"
-                  disabled={isLoading || isToolInvocationInProgress()}
-                >
-                  <MessageCirclePlus className="size-4 group-hover:rotate-12 transition-all" />
-                </Button>
-              )}
-              <Button
-                type={isLoading ? 'button' : 'submit'}
-                size={'icon'}
-                variant={'outline'}
-                className={cn(isLoading && 'animate-pulse', 'rounded-full')}
-                disabled={
-                  (input.length === 0 && !isLoading) ||
-                  isToolInvocationInProgress()
+          </form>
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className={cn('max-w-3xl w-full mx-auto relative')}
+        >
+          {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
+          {showScrollToBottomButton && messages.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="absolute -top-10 right-4 z-20 size-8 rounded-full shadow-md"
+              onClick={handleScrollToBottom}
+              title="Scroll to bottom"
+            >
+              <ChevronDown size={16} />
+            </Button>
+          )}
+
+          <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
+            <Textarea
+              ref={inputRef}
+              name="input"
+              rows={2}
+              maxRows={5}
+              tabIndex={0}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
+              placeholder="Ask a question..."
+              spellCheck={false}
+              value={input}
+              disabled={isLoading || isToolInvocationInProgress()}
+              className="resize-none w-full min-h-12 bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              onChange={e => {
+                handleInputChange(e)
+                setShowEmptyScreen(e.target.value.length === 0)
+              }}
+              onKeyDown={e => {
+                if (
+                  e.key === 'Enter' &&
+                  !e.shiftKey &&
+                  !isComposing &&
+                  !enterDisabled
+                ) {
+                  if (input.trim().length === 0) {
+                    e.preventDefault()
+                    return
+                  }
+                  e.preventDefault()
+                  const textarea = e.target as HTMLTextAreaElement
+                  textarea.form?.requestSubmit()
                 }
-                onClick={isLoading ? stop : undefined}
-              >
-                {isLoading ? <Square size={20} /> : <ArrowUp size={20} />}
-              </Button>
+              }}
+              onFocus={() => setShowEmptyScreen(true)}
+              onBlur={() => setShowEmptyScreen(false)}
+            />
+
+            {/* Bottom menu area */}
+            <div className="flex items-center justify-between p-3">
+              <div className="flex items-center gap-2">
+                <ModelSelector models={models || []} />
+                <SearchModeToggle />
+              </div>
+              <div className="flex items-center gap-2">
+                {messages.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleNewChat}
+                    className="shrink-0 rounded-full group"
+                    type="button"
+                    disabled={isLoading || isToolInvocationInProgress()}
+                  >
+                    <MessageCirclePlus className="size-4 group-hover:rotate-12 transition-all" />
+                  </Button>
+                )}
+                <Button
+                  type={isLoading ? 'button' : 'submit'}
+                  size={'icon'}
+                  variant={'outline'}
+                  className={cn(isLoading && 'animate-pulse', 'rounded-full')}
+                  disabled={
+                    (input.length === 0 && !isLoading) ||
+                    isToolInvocationInProgress()
+                  }
+                  onClick={isLoading ? stop : undefined}
+                >
+                  {isLoading ? <Square size={20} /> : <ArrowUp size={20} />}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {messages.length === 0 && (
-          <EmptyScreen
-            submitMessage={message => {
-              handleInputChange({
-                target: { value: message }
-              } as React.ChangeEvent<HTMLTextAreaElement>)
-            }}
-            className={cn(showEmptyScreen ? 'visible' : 'invisible')}
-          />
-        )}
-      </form>
+          {messages.length === 0 && (
+            <EmptyScreen
+              submitMessage={message => {
+                handleInputChange({
+                  target: { value: message }
+                } as React.ChangeEvent<HTMLTextAreaElement>)
+              }}
+              className={cn(showEmptyScreen ? 'visible' : 'invisible')}
+            />
+          )}
+        </form>
+      )}
     </div>
   )
 }
