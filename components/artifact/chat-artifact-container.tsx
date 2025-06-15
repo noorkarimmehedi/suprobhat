@@ -3,22 +3,27 @@
 import { InspectorDrawer } from '@/components/inspector/inspector-drawer'
 import { InspectorPanel } from '@/components/inspector/inspector-panel'
 import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup
 } from '@/components/ui/resizable'
-import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
-import { useMediaQuery } from '@/lib/hooks/use-media-query'
+import { useSidebar } from '@/components/ui/sidebar'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import React, { useEffect, useState } from 'react'
 import { useArtifact } from './artifact-context'
-export function ChatArtifactContainer({
-  children
-}: {
+
+interface ChatArtifactContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
-}) {
+}
+
+export function ChatArtifactContainer({
+  children,
+  className,
+  ...props
+}: ChatArtifactContainerProps) {
   const { state } = useArtifact()
-  const isMobile = useMediaQuery('(max-width: 767px)') // Below md breakpoint
+  const isMobile = useIsMobile()
   const [renderPanel, setRenderPanel] = useState(state.isOpen)
   const { open, openMobile, isMobile: isMobileSidebar } = useSidebar()
 
@@ -31,12 +36,13 @@ export function ChatArtifactContainer({
   }, [state.isOpen])
 
   return (
-    <div className="flex-1 min-h-0 h-screen flex">
-      <div className="absolute p-4 z-50 transition-opacity duration-1000">
-        {(!open || isMobileSidebar) && (
-          <SidebarTrigger className="animate-fade-in" />
-        )}
-      </div>
+    <div
+      className={cn(
+        'relative flex h-full w-full flex-col overflow-hidden',
+        className
+      )}
+      {...props}
+    >
       {/* Desktop: Resizable panels (Do not render on mobile) */}
       {!isMobile && (
         <ResizablePanelGroup

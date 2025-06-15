@@ -1,4 +1,3 @@
-import AppSidebar from '@/components/app-sidebar'
 import ArtifactRoot from '@/components/artifact/artifact-root'
 import Header from '@/components/header'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -74,17 +73,16 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider defaultOpen>
-            <AppSidebar />
+          <SidebarProvider defaultOpen={false}>
             <div className="flex flex-col flex-1">
               <Header user={user} />
               <main className="flex flex-1 min-h-0">
                 <ArtifactRoot>{children}</ArtifactRoot>
               </main>
             </div>
+            <Toaster />
+            <Analytics />
           </SidebarProvider>
-          <Toaster />
-          <Analytics />
         </ThemeProvider>
       </body>
     </html>

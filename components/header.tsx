@@ -1,33 +1,39 @@
 'use client'
 
-import { useSidebar } from '@/components/ui/sidebar'
+import { ChatHistoryPopover } from '@/components/chat-history-popover'
+import GuestMenu from '@/components/guest-menu'
+import UserMenu from '@/components/user-menu'
 import { cn } from '@/lib/utils'
-import { User } from '@supabase/supabase-js'
-// import Link from 'next/link' // No longer needed directly here for Sign In button
-import React from 'react'
-// import { Button } from './ui/button' // No longer needed directly here for Sign In button
-import GuestMenu from './guest-menu' // Import the new GuestMenu component
-import UserMenu from './user-menu'
+import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from './ui/button'
 
 interface HeaderProps {
-  user: User | null
+  user: any
 }
 
 export const Header: React.FC<HeaderProps> = ({ user }) => {
-  const { open } = useSidebar()
   return (
     <header
       className={cn(
-        'absolute top-0 right-0 p-2 flex justify-between items-center z-10 backdrop-blur lg:backdrop-blur-none bg-background/80 lg:bg-transparent transition-[width] duration-200 ease-linear',
-        open ? 'md:w-[calc(100%-var(--sidebar-width))]' : 'md:w-full',
-        'w-full'
+        'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+        'px-4 py-2'
       )}
     >
-      {/* This div can be used for a logo or title on the left if needed */}
-      <div></div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Button asChild variant="ghost" size="icon" className="size-8 mr-2">
+            <Link href="/" title="New Chat">
+              <Plus className="size-5" />
+              <span className="sr-only">New Chat</span>
+            </Link>
+          </Button>
+        </div>
 
-      <div className="flex items-center gap-2">
-        {user ? <UserMenu user={user} /> : <GuestMenu />}
+        <div className="flex items-center gap-4">
+          <ChatHistoryPopover />
+          {user ? <UserMenu user={user} /> : <GuestMenu />}
+        </div>
       </div>
     </header>
   )
