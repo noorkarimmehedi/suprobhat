@@ -1,7 +1,15 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { ChatHistoryClient } from './chat-history-client'
 
-export async function ChatHistorySection() {
-  const enableSaveChatHistory = process.env.ENABLE_SAVE_CHAT_HISTORY === 'true'
+export function ChatHistorySection() {
+  const [enableSaveChatHistory, setEnableSaveChatHistory] = useState(false)
+
+  useEffect(() => {
+    setEnableSaveChatHistory(process.env.NEXT_PUBLIC_ENABLE_SAVE_CHAT_HISTORY === 'true')
+  }, [])
+
   if (!enableSaveChatHistory) {
     return null
   }
