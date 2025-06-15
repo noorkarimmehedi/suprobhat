@@ -5,6 +5,7 @@ import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
 import { ArrowUp, ChevronDown, MessageCirclePlus, Sparkles, Square } from 'lucide-react'
+import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
@@ -199,6 +200,7 @@ export function ChatPanel({
   const generateSuperPrompt = async (userInput: string) => {
     try {
       setIsGeneratingPrompt(true)
+      const chatId = nanoid()
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -288,7 +290,8 @@ Await user response. Ask clarifying questions if needed, then produce the final 
               content: userInput
             }
           ],
-          model: GPT4_MODEL
+          model: GPT4_MODEL,
+          id: chatId
         })
       })
 
@@ -296,8 +299,40 @@ Await user response. Ask clarifying questions if needed, then produce the final 
         throw new Error('Failed to generate super prompt')
       }
 
-      const data = await response.json()
-      const generatedPrompt = data.messages[data.messages.length - 1].content
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No response stream available')
+      }
+
+      let generatedPrompt = ''
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        // Convert the Uint8Array to a string
+        const chunk = new TextDecoder().decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            if (data === '[DONE]') continue
+
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.choices?.[0]?.delta?.content) {
+                generatedPrompt += parsed.choices[0].delta.content
+              }
+            } catch (e) {
+              console.error('Error parsing chunk:', e)
+            }
+          }
+        }
+      }
+
+      if (generatedPrompt.trim().length === 0) {
+        throw new Error('No prompt was generated')
+      }
 
       handleInputChange({
         target: { value: generatedPrompt }
