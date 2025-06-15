@@ -1,6 +1,6 @@
 'use client'
 
-import { getCurrentUser } from '@/lib/auth/get-current-user'
+import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
@@ -48,21 +48,13 @@ export function ChatPanel({
   scrollContainerRef
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const router = useRouter()
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const isFirstRender = useRef(true)
   const [isComposing, setIsComposing] = useState(false) // Composition state
   const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
   const { close: closeArtifact } = useArtifact()
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const user = await getCurrentUser()
-      setIsAuthenticated(!!user)
-    }
-    checkAuth()
-  }, [])
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -163,6 +155,10 @@ export function ChatPanel({
       <SearchModeToggle />
     </div>
   )
+
+  if (isAuthLoading) {
+    return null // or a loading spinner if you prefer
+  }
 
   return (
     <div
