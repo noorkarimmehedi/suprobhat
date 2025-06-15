@@ -3,11 +3,10 @@
 import GuestMenu from '@/components/guest-menu'
 import UserMenu from '@/components/user-menu'
 import { cn } from '@/lib/utils'
-import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { ChatHistoryPopover } from './chat-history-popover'
-import plusStyles from './ui/plus-button.module.css'
+import styles from './ui/plus-button.module.css'
 
 interface HeaderProps {
   user: any
@@ -45,12 +44,12 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <button 
-            className={plusStyles.plusButton}
+            className={styles.plusButton}
             onClick={handleNewChat}
             title="New Chat"
             type="button"
+            aria-label="New Chat"
           >
-            <Plus className={plusStyles.icon} />
             <span className="sr-only">New Chat</span>
           </button>
         </div>
