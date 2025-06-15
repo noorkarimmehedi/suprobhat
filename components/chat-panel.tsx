@@ -168,8 +168,8 @@ export function ChatPanel({
       )}
     >
       {messages.length === 0 ? (
-        <div className="flex flex-col items-center justify-center flex-1 max-w-3xl w-full mx-auto gap-2">
-          <div className="max-w-3xl w-full h-[250px]">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-3xl w-full mx-auto gap-2">
+          <div className="w-full h-[250px] flex items-center justify-center">
             <TextHoverEffect
               text="Arc Lab"
               duration={0.5}
@@ -177,7 +177,7 @@ export function ChatPanel({
           </div>
           <form
             onSubmit={handleSubmit}
-            className={cn('max-w-3xl w-full mx-auto relative')}
+            className={cn('w-full max-w-2xl mx-auto relative')}
           >
             <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
               {isAuthenticated ? (
@@ -227,7 +227,7 @@ export function ChatPanel({
       ) : (
         <form
           onSubmit={handleSubmit}
-          className={cn('max-w-3xl w-full mx-auto relative')}
+          className={cn('w-full max-w-2xl mx-auto relative')}
         >
           {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
           {showScrollToBottomButton && messages.length > 0 && (
