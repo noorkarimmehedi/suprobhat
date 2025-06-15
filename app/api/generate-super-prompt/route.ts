@@ -1,9 +1,20 @@
+import { Redis } from '@upstash/redis'
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+
+// Initialize Redis client if UPSTASH_REDIS_REST_URL is available
+const redis = process.env.UPSTASH_REDIS_REST_URL
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+    })
+  : null
+
+const CACHE_TTL = 60 * 60 * 24 // 24 hours in seconds
 
 const SYSTEM_PROMPT = `You are a Super Prompt Engineer, specializing in creating highly structured, verifiable, and effective prompts for AI systems. Your role is to transform user inputs into comprehensive, well-organized prompts that maximize accuracy and minimize hallucination.
 
@@ -65,6 +76,15 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Try to get from cache first
+    if (redis) {
+      const cacheKey = `super-prompt:${input}`
+      const cachedPrompt = await redis.get(cacheKey)
+      if (cachedPrompt) {
+        return NextResponse.json({ prompt: cachedPrompt })
+      }
+    }
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [
@@ -77,8 +97,10 @@ export async function POST(req: NextRequest) {
           content: input
         }
       ],
-      temperature: 0.7,
-      max_tokens: 2000
+      temperature: 0.5, // Reduced from 0.7 for more focused responses
+      max_tokens: 1000, // Reduced from 2000 since we don't need that many tokens
+      presence_penalty: 0.1, // Slight penalty to avoid repetition
+      frequency_penalty: 0.1 // Slight penalty to encourage diverse word choice
     })
 
     const generatedPrompt = response.choices[0]?.message?.content
@@ -88,6 +110,12 @@ export async function POST(req: NextRequest) {
         { error: 'No prompt was generated' },
         { status: 500 }
       )
+    }
+
+    // Cache the result if Redis is available
+    if (redis) {
+      const cacheKey = `super-prompt:${input}`
+      await redis.set(cacheKey, generatedPrompt, { ex: CACHE_TTL })
     }
 
     return NextResponse.json({ prompt: generatedPrompt })
