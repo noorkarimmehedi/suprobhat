@@ -312,7 +312,7 @@ export function ChatPanel({
               {isAuthenticated ? (
                 <>
                   {renderInput()}
-                  <div className="px-4 pb-2">
+                  <div className="pl-2 pr-4 pb-2">
                     <Button
                       type="button"
                       variant="ghost"
@@ -400,7 +400,7 @@ export function ChatPanel({
             {isAuthenticated ? (
               <>
                 {renderInput()}
-                <div className="px-4 pb-2">
+                <div className="pl-2 pr-4 pb-2">
                   <Button
                     type="button"
                     variant="ghost"
