@@ -18,7 +18,7 @@ import { Link2, LogOut, Palette } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ExternalLinkItems } from './external-link-items'
 import { ThemeMenuItems } from './theme-menu-items'
-import styles from './ui/avatar-button.module.css'
+import styles from './ui/user-avatar-button.module.css'
 
 interface UserMenuProps {
   user: User
@@ -55,7 +55,7 @@ export default function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={styles.avatarButton} type="button">
+        <button className={styles.userAvatarButton} type="button" aria-label="User menu">
           <Avatar className={styles.avatar}>
             <AvatarImage src={avatarUrl} alt={userName} />
             <AvatarFallback>{getInitials(userName, user.email)}</AvatarFallback>

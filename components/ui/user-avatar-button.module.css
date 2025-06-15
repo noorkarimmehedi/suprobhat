@@ -1,0 +1,95 @@
+.userAvatarButton {
+  appearance: none;
+  background-color: #fafbfc;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 6px;
+  box-shadow:
+    rgba(27, 31, 35, 0.04) 0 1px 0,
+    rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 0;
+  line-height: 0;
+  list-style: none;
+  padding: 8px;
+  position: relative;
+  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+  word-wrap: break-word;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+}
+
+.userAvatarButton:hover {
+  background-color: #f3f4f6;
+  text-decoration: none;
+  transition-duration: 0.1s;
+}
+
+.userAvatarButton:disabled {
+  background-color: #fafbfc;
+  border-color: rgba(27, 31, 35, 0.15);
+  color: #959da5;
+  cursor: default;
+}
+
+.userAvatarButton:active {
+  background-color: #edeff2;
+  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+  transition: none 0s;
+}
+
+.userAvatarButton:focus {
+  outline: 1px transparent;
+}
+
+.userAvatarButton:before {
+  display: none;
+}
+
+.userAvatarButton:-webkit-details-marker {
+  display: none;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .userAvatarButton {
+    background-color: #1f2937;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+      rgba(0, 0, 0, 0.1) 0 1px 0,
+      rgba(255, 255, 255, 0.05) 0 1px 0 inset;
+  }
+
+  .userAvatarButton:hover {
+    background-color: #374151;
+  }
+
+  .userAvatarButton:disabled {
+    background-color: #1f2937;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #6b7280;
+  }
+
+  .userAvatarButton:active {
+    background-color: #4b5563;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 1px 0 inset;
+  }
+}
+
+.avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  transition: transform 0.2s ease;
+}
+
+.userAvatarButton:hover .avatar {
+  transform: scale(1.1);
+} 
