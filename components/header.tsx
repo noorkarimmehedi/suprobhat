@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { Button } from './ui/button'
+import styles from './ui/plus-button.module.css'
 
 interface HeaderProps {
   user: any
@@ -44,16 +44,15 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="size-8 mr-2 hover:bg-accent hover:text-accent-foreground transition-colors"
+          <button 
+            className={styles.plusButton}
             onClick={handleNewChat}
             title="New Chat"
+            type="button"
           >
-            <Plus className="size-5" />
+            <Plus className={styles.icon} />
             <span className="sr-only">New Chat</span>
-          </Button>
+          </button>
         </div>
 
         <div className="flex items-center gap-4">

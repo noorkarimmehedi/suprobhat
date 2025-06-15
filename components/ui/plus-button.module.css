@@ -1,0 +1,86 @@
+.clear {
+  clear: both;
+}
+
+.plusButton {
+  display: block;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  border-radius: 0.4rem;
+  background: white;
+  color: black;
+  border: 2px solid rgb(50, 50, 50);
+  border-bottom: 4px solid rgb(50, 50, 50);
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+  transform: translate(0, -3px);
+  transition: 0.2s;
+  transition-timing-function: linear;
+  position: relative;
+  overflow: visible;
+  background-color: white !important;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark mode specific styles with visible shadows */
+@media (prefers-color-scheme: dark) {
+  .plusButton {
+    background: white !important;
+    color: black !important;
+    border: 2px solid rgb(50, 50, 50) !important;
+    border-bottom: 4px solid rgb(50, 50, 50) !important;
+    box-shadow: 0px 1px 3px 0px rgba(200, 200, 200, 0.4) !important;
+  }
+  
+  .plusButton:hover {
+    box-shadow: 0px 2px 5px 0px rgba(200, 200, 200, 0.6) !important;
+    background: white !important;
+  }
+}
+
+/* Alternative: Force styles for dark theme classes */
+.dark .plusButton,
+.dark-theme .plusButton,
+[data-theme="dark"] .plusButton {
+  background: white !important;
+  color: black !important;
+  border: 2px solid rgb(50, 50, 50) !important;
+  border-bottom: 4px solid rgb(50, 50, 50) !important;
+  box-shadow: 0px 1px 3px 0px rgba(200, 200, 200, 0.4) !important;
+}
+
+.dark .plusButton:hover,
+.dark-theme .plusButton:hover,
+[data-theme="dark"] .plusButton:hover {
+  box-shadow: 0px 2px 5px 0px rgba(200, 200, 200, 0.6) !important;
+  background: white !important;
+}
+
+.plusButton:active {
+  transform: translate(0, 0);
+  border-bottom: 2px solid rgb(50, 50, 50);
+  background: white !important;
+}
+
+.transition {
+  transition: 0.2s linear;
+}
+
+/* Hover effect (light mode) */
+.plusButton:hover {
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.4);
+  background: white !important;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.plusButton:hover .icon {
+  transform: rotate(45deg);
+} 
