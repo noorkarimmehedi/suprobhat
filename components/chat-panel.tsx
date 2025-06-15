@@ -118,7 +118,7 @@ export function ChatPanel({
         <div className="flex flex-col items-center justify-center flex-1 max-w-3xl w-full mx-auto gap-2">
           <div className="max-w-3xl w-full h-[250px]">
             <TextHoverEffect
-              text="You are given a task to integrate an existing React component in the codebase"
+              text="Arc Lab"
               duration={0.5}
             />
           </div>
