@@ -27,9 +27,6 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
     // Dispatch event to notify chat components to reset
     window.dispatchEvent(new CustomEvent('new-chat-created'))
     
-    // Update chat history
-    window.dispatchEvent(new CustomEvent('chat-history-updated'))
-    
     // Navigate to home
     router.replace('/')
   }
@@ -55,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
         </div>
 
         <div className="flex items-center gap-4">
-          <ChatHistoryPopover />
+          {user && <ChatHistoryPopover />}
           {user ? <UserMenu user={user} /> : <GuestMenu />}
         </div>
       </div>

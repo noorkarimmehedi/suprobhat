@@ -1,7 +1,4 @@
-.clear {
-  clear: both;
-}
-
+/* From Uiverse.io by e-coders */
 .chatHistoryButton {
   appearance: none;
   background-color: #fafbfc;
@@ -15,37 +12,31 @@
     rgba(27, 31, 35, 0.04) 0 1px 0,
     rgba(255, 255, 255, 0.25) 0 1px 0 inset;
   box-sizing: border-box;
-  color: transparent;
+  color: transparent; /* Hide any text */
   cursor: pointer;
   display: inline-block;
-  font-size: 0;
-  line-height: 0;
+  font-size: 0; /* Remove font size to eliminate text space */
+  line-height: 0; /* Remove line height */
   list-style: none;
-  padding: 8px;
+  padding: 8px; /* Equal padding for square button */
   position: relative;
-  transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
   vertical-align: middle;
   white-space: nowrap;
   word-wrap: break-word;
-  width: 32px;
-  height: 32px;
-  text-indent: -9999px;
-  overflow: hidden;
+  width: 32px; /* Fixed width */
+  height: 32px; /* Fixed height */
+  text-indent: -9999px; /* Push any text out of view */
+  overflow: hidden; /* Hide overflowing content */
 }
 
 .chatHistoryButton:hover {
   background-color: #f3f4f6;
   text-decoration: none;
-  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.4);
-}
-
-.chatHistoryButton:active {
-  background-color: #edeff2;
-  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
-  transform: translateY(1px);
+  transition-duration: 0.1s;
 }
 
 .chatHistoryButton:disabled {
@@ -53,7 +44,12 @@
   border-color: rgba(27, 31, 35, 0.15);
   color: #959da5;
   cursor: default;
-  box-shadow: none;
+}
+
+.chatHistoryButton:active {
+  background-color: #edeff2;
+  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+  transition: none 0s;
 }
 
 .chatHistoryButton:focus {
@@ -72,6 +68,7 @@
 @media (prefers-color-scheme: dark) {
   .chatHistoryButton {
     background-color: #1f2937;
+    background-image: url('https://img.icons8.com/?size=100&id=70294&format=png&color=FFFFFF');
     border-color: rgba(255, 255, 255, 0.1);
     box-shadow:
       rgba(0, 0, 0, 0.1) 0 1px 0,
@@ -80,7 +77,6 @@
 
   .chatHistoryButton:hover {
     background-color: #374151;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.6);
   }
 
   .chatHistoryButton:active {
@@ -93,30 +89,4 @@
     border-color: rgba(255, 255, 255, 0.1);
     color: #6b7280;
   }
-}
-
-.chatHistoryButton:active {
-  transform: translate(0, 0);
-  border-bottom: 2px solid rgb(50, 50, 50);
-  background: white !important;
-}
-
-.transition {
-  transition: 0.2s linear;
-}
-
-/* Hover effect (light mode) */
-.chatHistoryButton:hover {
-  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.4);
-  background: white !important;
-}
-
-.icon {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.2s ease;
-}
-
-.chatHistoryButton:hover .icon {
-  transform: scale(1.1);
 } 

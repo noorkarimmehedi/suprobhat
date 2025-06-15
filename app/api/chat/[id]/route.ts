@@ -4,36 +4,17 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const enableSaveChatHistory = process.env.NEXT_PUBLIC_ENABLE_SAVE_CHAT_HISTORY === 'true'
-  if (!enableSaveChatHistory) {
-    return NextResponse.json(
-      { error: 'Chat history saving is disabled.' },
-      { status: 403 }
-    )
-  }
-
-  const chatId = (await params).id
-  if (!chatId) {
-    return NextResponse.json({ error: 'Chat ID is required' }, { status: 400 })
-  }
-
-  const userId = await getCurrentUserId()
-
   try {
-    const result = await deleteChat(chatId, userId)
+    const userId = await getCurrentUserId()
+    await deleteChat(params.id, userId)
 
-    if (result.error) {
-      const statusCode = result.error === 'Chat not found' ? 404 : 500
-      return NextResponse.json({ error: result.error }, { status: statusCode })
-    }
-
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(`API route error deleting chat ${chatId}:`, error)
+    console.error('Failed to delete chat:', error)
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Failed to delete chat' },
       { status: 500 }
     )
   }
