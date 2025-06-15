@@ -120,28 +120,43 @@ export async function getChatsPage(
 }
 
 export async function getChat(id: string, userId: string = 'anonymous') {
-  const redis = await getRedis()
-  const chat = await redis.hgetall<Chat>(`chat:${id}`)
+  try {
+    console.log('Fetching chat:', { chatId: id, userId })
+    const redis = await getRedis()
+    const chat = await redis.hgetall<Chat>(`chat:${id}`)
 
-  if (!chat) {
-    return null
-  }
+    if (!chat) {
+      console.log('Chat not found:', { chatId: id, userId })
+      return null
+    }
 
-  // Parse the messages if they're stored as a string
-  if (typeof chat.messages === 'string') {
-    try {
-      chat.messages = JSON.parse(chat.messages)
-    } catch (error) {
+    // Parse the messages if they're stored as a string
+    if (typeof chat.messages === 'string') {
+      try {
+        chat.messages = JSON.parse(chat.messages)
+      } catch (error) {
+        console.error('Error parsing chat messages:', error, { chatId: id })
+        chat.messages = []
+      }
+    }
+
+    // Ensure messages is always an array
+    if (!Array.isArray(chat.messages)) {
+      console.warn('Chat messages is not an array:', { chatId: id, messagesType: typeof chat.messages })
       chat.messages = []
     }
-  }
 
-  // Ensure messages is always an array
-  if (!Array.isArray(chat.messages)) {
-    chat.messages = []
-  }
+    console.log('Chat fetched successfully:', {
+      chatId: id,
+      userId,
+      messageCount: chat.messages.length
+    })
 
-  return chat
+    return chat
+  } catch (error) {
+    console.error('Error in getChat:', error, { chatId: id, userId })
+    return null
+  }
 }
 
 export async function clearChats(
@@ -204,6 +219,7 @@ export async function deleteChat(
 
 export async function saveChat(chat: Chat, userId: string = 'anonymous') {
   try {
+    console.log('Starting saveChat operation:', { chatId: chat.id, userId })
     const redis = await getRedis()
     const pipeline = redis.pipeline()
 
@@ -212,13 +228,25 @@ export async function saveChat(chat: Chat, userId: string = 'anonymous') {
       messages: JSON.stringify(chat.messages)
     }
 
+    console.log('Saving chat to Redis:', {
+      chatId: chat.id,
+      userId,
+      messageCount: chat.messages.length
+    })
+
     pipeline.hmset(`chat:${chat.id}`, chatToSave)
     pipeline.zadd(getUserChatKey(userId), Date.now(), `chat:${chat.id}`)
 
     const results = await pipeline.exec()
+    console.log('Redis pipeline executed successfully:', {
+      chatId: chat.id,
+      userId,
+      results
+    })
 
     return results
   } catch (error) {
+    console.error('Error in saveChat:', error, { chatId: chat.id, userId })
     throw error
   }
 }

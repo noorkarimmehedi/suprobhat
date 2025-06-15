@@ -68,6 +68,10 @@ export async function handleStreamFinish({
 
     // Only save chat history if enabled and user is authenticated (not anonymous)
     if (process.env.NEXT_PUBLIC_ENABLE_SAVE_CHAT_HISTORY !== 'true' || userId === 'anonymous') {
+      console.log('Chat not saved: history saving disabled or user is anonymous', {
+        historyEnabled: process.env.NEXT_PUBLIC_ENABLE_SAVE_CHAT_HISTORY,
+        userId
+      })
       return
     }
 
@@ -81,6 +85,13 @@ export async function handleStreamFinish({
       id: chatId
     }
 
+    console.log('Saving chat:', {
+      chatId,
+      userId,
+      messageCount: generatedMessages.length,
+      existingChat: !!savedChat
+    })
+
     // Save chat with complete response and related questions
     await saveChat(
       {
@@ -92,6 +103,8 @@ export async function handleStreamFinish({
       console.error('Failed to save chat:', error)
       throw new Error('Failed to save chat history')
     })
+
+    console.log('Chat saved successfully:', { chatId, userId })
   } catch (error) {
     console.error('Error in handleStreamFinish:', error)
     throw error

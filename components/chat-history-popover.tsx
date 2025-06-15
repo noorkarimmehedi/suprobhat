@@ -145,7 +145,7 @@ export function ChatHistoryPopover() {
                   <li key={chat.id} className="group">
                     <button
                       onClick={() => {
-                        router.push(`/chat/${chat.id}`)
+                        router.push(`/search/${chat.id}`)
                         setIsOpen(false)
                       }}
                       className="w-full px-4 py-3 text-left hover:bg-accent hover:text-accent-foreground transition-colors"
