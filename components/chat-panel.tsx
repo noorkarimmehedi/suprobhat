@@ -116,7 +116,7 @@ export function ChatPanel({
     >
       {messages.length === 0 && (
         <div className="mb-10 flex flex-col items-center gap-4">
-          <div className="w-[600px] h-[200px]">
+          <div className="max-w-3xl w-full h-[250px]">
             <TextHoverEffect 
               text="Arc Lab" 
               duration={0.3}
