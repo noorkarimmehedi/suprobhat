@@ -58,9 +58,23 @@ export function Chat({
     onError: error => {
       toast.error(`Error in chat: ${error.message}`)
     },
-    sendExtraMessageFields: false, // Disable extra message fields,
+    sendExtraMessageFields: false,
     experimental_throttle: 100
   })
+
+  // Listen for new chat creation and reset state
+  useEffect(() => {
+    const handleNewChat = () => {
+      setMessages([])
+      setData(undefined)
+      stop()
+    }
+
+    window.addEventListener('new-chat-created', handleNewChat)
+    return () => {
+      window.removeEventListener('new-chat-created', handleNewChat)
+    }
+  }, [setMessages, setData, stop])
 
   const isLoading = status === 'submitted' || status === 'streaming'
 

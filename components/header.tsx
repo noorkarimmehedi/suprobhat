@@ -22,7 +22,16 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
   }, [router])
 
   const handleNewChat = () => {
-    // Use replace instead of push for faster navigation
+    // Clear any existing chat state from localStorage
+    localStorage.removeItem('chat-state')
+    
+    // Dispatch event to notify chat components to reset
+    window.dispatchEvent(new CustomEvent('new-chat-created'))
+    
+    // Update chat history
+    window.dispatchEvent(new CustomEvent('chat-history-updated'))
+    
+    // Navigate to home
     router.replace('/')
   }
 
