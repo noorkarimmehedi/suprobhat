@@ -12,7 +12,7 @@
   font-size: 0;
   line-height: 0;
   list-style: none;
-  padding: 8px;
+  padding: 4px;
   position: relative;
   transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;
@@ -84,10 +84,11 @@
 }
 
 .avatar {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
   transition: transform 0.2s ease;
+  object-fit: cover;
 }
 
 .userAvatarButton:hover .avatar {
