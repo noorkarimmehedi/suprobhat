@@ -2,7 +2,7 @@
 .userAvatarButton {
   appearance: none;
   background-color: #fafbfc;
-  background-image: url('https://img.icons8.com/?size=100&id=15265&format=png&color=000000');
+  background-image: url('https://img.icons8.com/?size=100&id=65342&format=png&color=000000');
   background-size: 16px 16px;
   background-repeat: no-repeat;
   background-position: center;
@@ -62,4 +62,30 @@
 
 .userAvatarButton:-webkit-details-marker {
   display: none;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .userAvatarButton {
+    background-color: #21262d;
+    border-color: rgba(240, 246, 252, 0.1);
+    box-shadow:
+      rgba(27, 31, 35, 0.04) 0 1px 0,
+      rgba(255, 255, 255, 0.02) 0 1px 0 inset;
+  }
+
+  .userAvatarButton:hover {
+    background-color: #30363d;
+  }
+
+  .userAvatarButton:disabled {
+    background-color: #21262d;
+    border-color: rgba(240, 246, 252, 0.1);
+    color: #8b949e;
+  }
+
+  .userAvatarButton:active {
+    background-color: #1f2428;
+    box-shadow: rgba(88, 166, 255, 0.1) 0 1px 0 inset;
+  }
 } 
