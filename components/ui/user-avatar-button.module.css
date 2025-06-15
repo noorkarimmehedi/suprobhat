@@ -3,7 +3,7 @@
   appearance: none;
   background-color: #fafbfc;
   background-image: url('https://img.icons8.com/?size=100&id=65342&format=png&color=000000');
-  background-size: 20px 20px; /* Increased from 16px to 20px for better visibility */
+  background-size: 18px 18px; /* Adjusted for better icon clarity */
   background-repeat: no-repeat;
   background-position: center center; /* Explicitly set center positioning */
   border: 1px solid rgba(27, 31, 35, 0.15);
@@ -18,7 +18,7 @@
   font-size: 0; /* Remove font size to eliminate text space */
   line-height: 0; /* Remove line height */
   list-style: none;
-  padding: 6px; /* Slightly reduced padding to give more space for the icon */
+  padding: 8px; /* Reverted to original padding */
   position: relative;
   transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;
@@ -27,8 +27,8 @@
   vertical-align: middle;
   white-space: nowrap;
   word-wrap: break-word;
-  width: 36px; /* Slightly increased width */
-  height: 36px; /* Slightly increased height */
+  width: 32px; /* Reverted to original width */
+  height: 32px; /* Reverted to original height */
   text-indent: -9999px; /* Push any text out of view */
   overflow: hidden; /* Hide overflowing content */
 }
