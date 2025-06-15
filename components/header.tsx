@@ -1,21 +1,25 @@
 'use client'
 
-import { ChatHistoryPopover } from '@/components/chat-history-popover'
 import GuestMenu from '@/components/guest-menu'
-import styles from '@/components/ui/plus-button.module.css'
 import UserMenu from '@/components/user-menu'
-import { User } from '@supabase/supabase-js'
-import { Plus } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { History, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
+import { useEffect } from 'react'
+import chatHistoryStyles from './ui/chat-history-button.module.css'
+import plusStyles from './ui/plus-button.module.css'
 
 interface HeaderProps {
-  user?: User
+  user: any
 }
 
-export default function Header({ user }: HeaderProps) {
+export const Header: React.FC<HeaderProps> = ({ user }) => {
   const router = useRouter()
-  const [isPending, startTransition] = useTransition()
+
+  // Prefetch the home route for instant navigation
+  useEffect(() => {
+    router.prefetch('/')
+  }, [router])
 
   const handleNewChat = () => {
     // Clear any existing chat state from localStorage
@@ -27,35 +31,48 @@ export default function Header({ user }: HeaderProps) {
     // Update chat history
     window.dispatchEvent(new CustomEvent('chat-history-updated'))
     
-    startTransition(() => {
-      router.push('/')
-    })
+    // Navigate to home
+    router.replace('/')
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 flex">
-          <button
+    <header
+      className={cn(
+        'sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+        'px-4 py-2'
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <button 
+            className={plusStyles.plusButton}
             onClick={handleNewChat}
-            className={styles.plusButton}
-            disabled={isPending}
-            aria-label="New Chat"
+            title="New Chat"
+            type="button"
           >
-            <Plus className={styles.icon} />
+            <Plus className={plusStyles.icon} />
+            <span className="sr-only">New Chat</span>
           </button>
-          <div className="ml-2">
-            <ChatHistoryPopover />
-          </div>
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <div className="flex items-center gap-4">
-              {user ? <UserMenu user={user} /> : <GuestMenu />}
-            </div>
-          </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            className={chatHistoryStyles.chatHistoryButton}
+            title="Chat History"
+            type="button"
+            onClick={() => {
+              const event = new CustomEvent('toggle-chat-history')
+              window.dispatchEvent(event)
+            }}
+          >
+            <History className={chatHistoryStyles.icon} />
+            <span className="sr-only">Chat History</span>
+          </button>
+          {user ? <UserMenu user={user} /> : <GuestMenu />}
         </div>
       </div>
     </header>
   )
 }
+
+export default Header

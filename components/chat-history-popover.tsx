@@ -62,6 +62,16 @@ export function ChatHistoryPopover({ className }: ChatHistoryPopoverProps) {
     }
   }, [isOpen])
 
+  useEffect(() => {
+    const handleToggle = () => {
+      setIsOpen(prev => !prev)
+    }
+    window.addEventListener('toggle-chat-history', handleToggle)
+    return () => {
+      window.removeEventListener('toggle-chat-history', handleToggle)
+    }
+  }, [])
+
   const filteredChats = chats.filter(chat =>
     chat.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
