@@ -1,34 +1,34 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import {
-  Link2,
-  LogIn,
-  Palette,
-  Settings2 // Or EllipsisVertical, etc.
+    Link2,
+    LogIn,
+    Palette,
+    Settings2
 } from 'lucide-react'
 import Link from 'next/link'
 import { ExternalLinkItems } from './external-link-items'
 import { ThemeMenuItems } from './theme-menu-items'
+import styles from './ui/settings-button.module.css'
 
 export default function GuestMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Settings2 className="h-5 w-5" /> {/* Choose an icon */}
+        <button className={styles.settingsButton}>
+          <Settings2 className={styles.icon} />
           <span className="sr-only">Open menu</span>
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuItem asChild>
