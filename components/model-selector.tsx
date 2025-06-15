@@ -1,20 +1,21 @@
 'use client'
 
+import { useUser } from '@/lib/hooks/use-user'
 import { Model } from '@/lib/types/models'
 import { getCookie, setCookie } from '@/lib/utils/cookies'
 import { isReasoningModel } from '@/lib/utils/registry'
-import { Check, ChevronsUpDown, Lightbulb } from 'lucide-react'
+import { Check, ChevronsUpDown, Lightbulb, Lock } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { createModelId } from '../lib/utils'
 import { Button } from './ui/button'
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList
 } from './ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 
@@ -38,18 +39,28 @@ interface ModelSelectorProps {
 export function ModelSelector({ models }: ModelSelectorProps) {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState('')
+  const { user } = useUser()
 
   useEffect(() => {
     const savedModel = getCookie('selectedModel')
     if (savedModel) {
       try {
         const model = JSON.parse(savedModel) as Model
-        setValue(createModelId(model))
+        // If user is not logged in and model requires auth, reset to GPT-4o mini
+        if (!user && model.requiresAuth) {
+          const defaultModel = models.find(m => m.id === 'gpt-4o-mini')
+          if (defaultModel) {
+            setValue(createModelId(defaultModel))
+            setCookie('selectedModel', JSON.stringify(defaultModel))
+          }
+        } else {
+          setValue(createModelId(model))
+        }
       } catch (e) {
         console.error('Failed to parse saved model:', e)
       }
     }
-  }, [])
+  }, [user, models])
 
   const handleModelSelect = (id: string) => {
     const newValue = id === value ? '' : id
@@ -57,6 +68,10 @@ export function ModelSelector({ models }: ModelSelectorProps) {
     
     const selectedModel = models.find(model => createModelId(model) === newValue)
     if (selectedModel) {
+      // If user is not logged in and model requires auth, don't allow selection
+      if (!user && selectedModel.requiresAuth) {
+        return
+      }
       setCookie('selectedModel', JSON.stringify(selectedModel))
     } else {
       setCookie('selectedModel', '')
@@ -66,7 +81,8 @@ export function ModelSelector({ models }: ModelSelectorProps) {
   }
 
   const selectedModel = models.find(model => createModelId(model) === value)
-  const groupedModels = groupModelsByProvider(models)
+  const filteredModels = user ? models : models.filter(model => !model.requiresAuth)
+  const groupedModels = groupModelsByProvider(filteredModels)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -106,12 +122,15 @@ export function ModelSelector({ models }: ModelSelectorProps) {
               <CommandGroup key={provider} heading={provider}>
                 {models.map(model => {
                   const modelId = createModelId(model)
+                  const isLocked = !user && model.requiresAuth
                   return (
                     <CommandItem
                       key={modelId}
                       value={modelId}
-                      onSelect={handleModelSelect}
-                      className="flex justify-between"
+                      onSelect={() => !isLocked && handleModelSelect(modelId)}
+                      className={`flex justify-between ${
+                        isLocked ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     >
                       <div className="flex items-center space-x-2">
                         <Image
@@ -124,6 +143,9 @@ export function ModelSelector({ models }: ModelSelectorProps) {
                         <span className="text-xs font-medium">
                           {model.name}
                         </span>
+                        {isLocked && (
+                          <Lock size={12} className="text-muted-foreground" />
+                        )}
                       </div>
                       <Check
                         className={`h-4 w-4 ${
