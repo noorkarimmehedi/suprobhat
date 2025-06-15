@@ -77,11 +77,9 @@ export function BillingDialog({ open, onOpenChange }: BillingDialogProps) {
 
   const handlePlanClick = async () => {
     if (!isAuthenticated) {
-      onOpenChange(false) // Close the dialog first
+      onOpenChange(false)
       router.push('/auth/login')
     } else {
-      // Handle authenticated user plan selection
-      // You can add your subscription logic here
       onOpenChange(false)
     }
   }
@@ -90,9 +88,7 @@ export function BillingDialog({ open, onOpenChange }: BillingDialogProps) {
     <Dialog 
       open={open} 
       onOpenChange={(newOpen) => {
-        // Ensure the dialog state is properly updated
         if (!newOpen) {
-          // Add a small delay before closing to prevent menu issues
           setTimeout(() => {
             onOpenChange(false)
           }, 100)
@@ -102,22 +98,21 @@ export function BillingDialog({ open, onOpenChange }: BillingDialogProps) {
       }}
     >
       <DialogContent 
-        className="max-w-7xl max-h-[90vh] overflow-y-auto"
+        className="max-w-4xl max-h-[85vh] overflow-y-auto p-4 sm:p-6"
         onInteractOutside={(e) => {
-          // Prevent closing when clicking outside
           e.preventDefault()
         }}
       >
-        <DialogHeader>
-          <DialogTitle className="text-3xl font-bold text-center">
-            Simple, transparent pricing
+        <DialogHeader className="space-y-2 pb-4">
+          <DialogTitle className="text-2xl font-bold text-center">
+            Choose Your Plan
           </DialogTitle>
-          <DialogDescription className="text-center text-lg">
-            Choose the perfect plan for your needs. All plans include a 14-day free trial.
+          <DialogDescription className="text-center text-sm">
+            All plans include a 14-day free trial
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {plans.map((plan) => (
             <Card
               key={plan.name}
@@ -126,34 +121,34 @@ export function BillingDialog({ open, onOpenChange }: BillingDialogProps) {
                 plan.popular && 'border-primary shadow-lg'
               )}
             >
-              <CardHeader>
+              <CardHeader className="p-4 pb-2">
                 {plan.popular && (
-                  <div className="px-3 py-1 text-sm text-primary bg-primary/10 rounded-full w-fit">
+                  <div className="px-2 py-0.5 text-xs text-primary bg-primary/10 rounded-full w-fit mb-2">
                     Most Popular
                   </div>
                 )}
-                <CardTitle className="text-2xl mt-4">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">{plan.price}</span>
+                <CardTitle className="text-lg">{plan.name}</CardTitle>
+                <CardDescription className="text-xs">{plan.description}</CardDescription>
+                <div className="mt-2">
+                  <span className="text-2xl font-bold">{plan.price}</span>
                   {plan.period && (
-                    <span className="text-muted-foreground ml-1">{plan.period}</span>
+                    <span className="text-muted-foreground text-sm ml-1">{plan.period}</span>
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="flex-grow">
-                <ul className="space-y-3">
+              <CardContent className="p-4 pt-2 flex-grow">
+                <ul className="space-y-2 text-sm">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start">
-                      <Check className="h-5 w-5 text-primary shrink-0 mr-2" />
-                      <span className="text-muted-foreground">{feature}</span>
+                      <Check className="h-4 w-4 text-primary shrink-0 mr-2 mt-0.5" />
+                      <span className="text-muted-foreground text-xs">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="p-4 pt-2">
                 <Button
-                  className="w-full"
+                  className="w-full text-sm h-8"
                   variant={plan.popular ? 'default' : 'outline'}
                   onClick={handlePlanClick}
                 >
@@ -164,24 +159,24 @@ export function BillingDialog({ open, onOpenChange }: BillingDialogProps) {
           ))}
         </div>
 
-        <div className="mt-8 text-center">
-          <h2 className="text-2xl font-semibold mb-4">Frequently Asked Questions</h2>
-          <div className="max-w-3xl mx-auto space-y-4 text-left">
+        <div className="mt-6 text-center">
+          <h2 className="text-lg font-semibold mb-3">Frequently Asked Questions</h2>
+          <div className="max-w-2xl mx-auto space-y-3 text-left">
             <div>
-              <h3 className="font-medium mb-2">Can I change plans later?</h3>
-              <p className="text-muted-foreground">
+              <h3 className="font-medium text-sm mb-1">Can I change plans later?</h3>
+              <p className="text-muted-foreground text-xs">
                 Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
               </p>
             </div>
             <div>
-              <h3 className="font-medium mb-2">What payment methods do you accept?</h3>
-              <p className="text-muted-foreground">
+              <h3 className="font-medium text-sm mb-1">What payment methods do you accept?</h3>
+              <p className="text-muted-foreground text-xs">
                 We accept all major credit cards, PayPal, and bank transfers for enterprise customers.
               </p>
             </div>
             <div>
-              <h3 className="font-medium mb-2">Is there a refund policy?</h3>
-              <p className="text-muted-foreground">
+              <h3 className="font-medium text-sm mb-1">Is there a refund policy?</h3>
+              <p className="text-muted-foreground text-xs">
                 Yes, we offer a 14-day money-back guarantee for all paid plans. No questions asked.
               </p>
             </div>
