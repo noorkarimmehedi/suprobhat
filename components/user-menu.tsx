@@ -14,8 +14,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { Link2, LogOut, Palette } from 'lucide-react'
+import { CreditCard, Link2, LogOut, Palette } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { BillingDialog } from './billing-dialog'
 import { ExternalLinkItems } from './external-link-items'
 import { ThemeMenuItems } from './theme-menu-items'
 import styles from './ui/user-avatar-button.module.css'
@@ -26,6 +28,7 @@ interface UserMenuProps {
 
 export default function UserMenu({ user }: UserMenuProps) {
   const router = useRouter()
+  const [showBillingDialog, setShowBillingDialog] = useState(false)
   const userName =
     user.user_metadata?.full_name || user.user_metadata?.name || 'User'
   const avatarUrl =
@@ -53,56 +56,67 @@ export default function UserMenu({ user }: UserMenuProps) {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button 
-          className={styles.userAvatarButton} 
-          type="button" 
-          aria-label="User menu"
-          title={userName}
-        >
-          <Avatar className={styles.avatar}>
-            <AvatarImage src={avatarUrl} alt={userName} />
-            <AvatarFallback>{getInitials(userName, user.email)}</AvatarFallback>
-          </Avatar>
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-60" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none truncate">
-              {userName}
-            </p>
-            <p className="text-xs leading-none text-muted-foreground truncate">
-              {user.email}
-            </p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Palette className="mr-2 h-4 w-4" />
-            <span>Theme</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <ThemeMenuItems />
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Link2 className="mr-2 h-4 w-4" />
-            <span>Links</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <ExternalLinkItems />
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Logout</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button 
+            className={styles.userAvatarButton} 
+            type="button" 
+            aria-label="User menu"
+            title={userName}
+          >
+            <Avatar className={styles.avatar}>
+              <AvatarImage src={avatarUrl} alt={userName} />
+              <AvatarFallback>{getInitials(userName, user.email)}</AvatarFallback>
+            </Avatar>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-60" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none truncate">
+                {userName}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground truncate">
+                {user.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Palette className="mr-2 h-4 w-4" />
+              <span>Theme</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <ThemeMenuItems />
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Link2 className="mr-2 h-4 w-4" />
+              <span>Links</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <ExternalLinkItems />
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setShowBillingDialog(true)}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            <span>Billing</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Logout</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <BillingDialog 
+        open={showBillingDialog} 
+        onOpenChange={setShowBillingDialog} 
+      />
+    </>
   )
 }
