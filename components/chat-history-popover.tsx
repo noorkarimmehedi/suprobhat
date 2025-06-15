@@ -1,19 +1,15 @@
 'use client'
 
-import { Input } from '@/components/ui/input'
 import {
     Popover,
     PopoverContent,
     PopoverTrigger
 } from '@/components/ui/popover'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Spinner } from '@/components/ui/spinner'
 import { Chat } from '@/lib/types'
-import { cn } from '@/lib/utils'
-import { History } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { ChatHistorySection } from './sidebar/chat-history-section'
 import styles from './ui/chat-history-button.module.css'
 
 interface ChatHistoryPopoverProps {
@@ -89,60 +85,12 @@ export function ChatHistoryPopover({ className }: ChatHistoryPopoverProps) {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <button
-          className={cn(styles.chatHistoryButton, className)}
-          title="Chat History"
-          type="button"
-        >
-          <History className={styles.icon} />
-          <span className="sr-only">Chat History</span>
+        <button className={styles.chatHistoryButton} aria-label="Chat history">
+          <span className="sr-only">Chat history</span>
         </button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-80 p-0"
-        align="end"
-        side="bottom"
-        sideOffset={8}
-      >
-        <div className="flex flex-col h-[400px]">
-          <div className="p-3 border-b">
-            <Input
-              placeholder="Search chats..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="h-8"
-            />
-          </div>
-          <ScrollArea className="flex-1">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-32">
-                <Spinner />
-              </div>
-            ) : filteredChats.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                {searchQuery ? 'No chats found' : 'No chat history'}
-              </div>
-            ) : (
-              <div className="p-2">
-                {filteredChats.map(chat => (
-                  <button
-                    key={chat.id}
-                    onClick={() => {
-                      router.push(chat.path)
-                      setIsOpen(false)
-                    }}
-                    className="w-full text-left px-2 py-1.5 rounded-md text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
-                  >
-                    <div className="font-medium truncate">{chat.title}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {formatDate(chat.createdAt)}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </div>
+      <PopoverContent className="w-80 p-0" align="end">
+        <ChatHistorySection />
       </PopoverContent>
     </Popover>
   )
