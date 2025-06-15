@@ -3,10 +3,10 @@
 import GuestMenu from '@/components/guest-menu'
 import UserMenu from '@/components/user-menu'
 import { cn } from '@/lib/utils'
-import { History, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import chatHistoryStyles from './ui/chat-history-button.module.css'
+import { ChatHistoryPopover } from './chat-history-popover'
 import plusStyles from './ui/plus-button.module.css'
 
 interface HeaderProps {
@@ -56,18 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button
-            className={chatHistoryStyles.chatHistoryButton}
-            title="Chat History"
-            type="button"
-            onClick={() => {
-              const event = new CustomEvent('toggle-chat-history')
-              window.dispatchEvent(event)
-            }}
-          >
-            <History className={chatHistoryStyles.icon} />
-            <span className="sr-only">Chat History</span>
-          </button>
+          <ChatHistoryPopover />
           {user ? <UserMenu user={user} /> : <GuestMenu />}
         </div>
       </div>

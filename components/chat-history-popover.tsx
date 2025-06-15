@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
     Popover,
@@ -15,6 +14,7 @@ import { History } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import styles from './ui/chat-history-button.module.css'
 
 interface ChatHistoryPopoverProps {
   className?: string
@@ -89,15 +89,14 @@ export function ChatHistoryPopover({ className }: ChatHistoryPopoverProps) {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn('size-8', className)}
+        <button
+          className={cn(styles.chatHistoryButton, className)}
           title="Chat History"
+          type="button"
         >
-          <History className="size-5" />
+          <History className={styles.icon} />
           <span className="sr-only">Chat History</span>
-        </Button>
+        </button>
       </PopoverTrigger>
       <PopoverContent
         className="w-80 p-0"
