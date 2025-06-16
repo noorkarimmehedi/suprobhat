@@ -4,7 +4,7 @@ import { AuthPrompt } from '@/components/auth-prompt'
 import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
-import { Message } from 'ai'
+import { ChatRequestOptions, Message } from 'ai'
 import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Twitter, Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -18,22 +18,30 @@ import { Button } from './ui/button'
 import { TextHoverEffect } from './ui/hover-text-effect'
 
 interface ChatPanelProps {
+  id: string
   input: string
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   isLoading: boolean
   messages: Message[]
   setMessages: (messages: Message[]) => void
-  query?: string
   stop: () => void
   append: (message: any) => void
-  models?: Model[]
-  /** Whether to show the scroll to bottom button */
-  showScrollToBottomButton: boolean
+  reload: (messageId: string, options?: ChatRequestOptions) => Promise<string | null | undefined>
+  selectedModel?: Model
+  setSelectedModel?: (model: Model) => void
+  selectedProvider?: string
+  setSelectedProvider?: (provider: string) => void
+  isStreaming?: boolean
+  setIsStreaming?: (isStreaming: boolean) => void
+  isToolCalling?: boolean
+  setIsToolCalling?: (isToolCalling: boolean) => void
+  isManualToolStream?: boolean
+  setIsManualToolStream?: (isManualToolStream: boolean) => void
+  isAuthenticated?: boolean
+  isAuthLoading?: boolean
   /** Reference to the scroll container */
   scrollContainerRef: React.RefObject<HTMLDivElement>
-  showSignInDialog: boolean
-  setShowSignInDialog: (show: boolean) => void
 }
 
 const SUPER_PROMPT = `You are a Prompt Generator, specializing in creating well-structured, verifiable, and low-hallucination prompts for any desired use case. Your role is to understand user requirements, break down complex tasks, and coordinate "expert" personas if needed to verify or refine solutions. You can ask clarifying questions when critical details are missing. Otherwise, minimize friction.
@@ -318,23 +326,34 @@ const GPT4_MODEL = {
 } as const
 
 export function ChatPanel({
+  id,
   input,
   handleInputChange,
   handleSubmit,
   isLoading,
   messages,
   setMessages,
-  query,
   stop,
   append,
-  models,
-  showScrollToBottomButton,
-  scrollContainerRef,
-  showSignInDialog,
-  setShowSignInDialog
+  reload,
+  selectedModel,
+  setSelectedModel,
+  selectedProvider,
+  setSelectedProvider,
+  isStreaming,
+  setIsStreaming,
+  isToolCalling,
+  setIsToolCalling,
+  isManualToolStream,
+  setIsManualToolStream,
+  isAuthenticated: propIsAuthenticated,
+  isAuthLoading: propIsAuthLoading,
+  scrollContainerRef
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { isAuthenticated: hookIsAuthenticated, isLoading: hookIsAuthLoading } = useAuth()
+  const isAuthenticated = propIsAuthenticated ?? hookIsAuthenticated
+  const isAuthLoading = propIsAuthLoading ?? hookIsAuthLoading
   const router = useRouter()
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const isFirstRender = useRef(true)
@@ -342,6 +361,7 @@ export function ChatPanel({
   const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
   const { close: closeArtifact } = useArtifact()
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false)
+  const [isAtBottom, setIsAtBottom] = useState(true)
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -376,15 +396,15 @@ export function ChatPanel({
 
   // if query is not empty, submit the query
   useEffect(() => {
-    if (isFirstRender.current && query && query.trim().length > 0) {
+    if (isFirstRender.current && input && input.trim().length > 0) {
       append({
         role: 'user',
-        content: query
+        content: input
       })
       isFirstRender.current = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query])
+  }, [input])
 
   // Scroll to the bottom of the container
   const handleScrollToBottom = () => {
@@ -396,6 +416,27 @@ export function ChatPanel({
       })
     }
   }
+
+  // Detect if scroll container is at the bottom
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container
+      const threshold = 50 // threshold in pixels
+      if (scrollHeight - scrollTop - clientHeight < threshold) {
+        setIsAtBottom(true)
+      } else {
+        setIsAtBottom(false)
+      }
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Set initial state
+
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const generateSuperPrompt = async (userInput: string) => {
     try {
@@ -506,7 +547,7 @@ export function ChatPanel({
 
   const renderModelSelector = () => (
     <div className="flex items-center gap-2">
-      <ModelSelector models={models || []} />
+      <ModelSelector models={selectedModel ? [selectedModel] : []} />
       <SearchModeToggle />
     </div>
   )
@@ -648,8 +689,8 @@ export function ChatPanel({
           onSubmit={handleSubmit}
           className={cn('w-full max-w-3xl mx-auto relative')}
         >
-          {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
-          {showScrollToBottomButton && messages.length > 0 && (
+          {/* Scroll to bottom button - only shown when not at bottom */}
+          {!isAtBottom && messages.length > 0 && (
             <Button
               type="button"
               variant="outline"

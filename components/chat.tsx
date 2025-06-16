@@ -1,11 +1,10 @@
 'use client'
 
-import { CHAT_ID } from '@/lib/constants'
+import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { useChat } from '@ai-sdk/react'
-import { ChatRequestOptions } from 'ai'
-import { Message } from 'ai/react'
+import { ChatRequestOptions, JSONValue, Message } from 'ai'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ChatMessages } from './chat-messages'
@@ -29,49 +28,45 @@ export function Chat({
   query?: string
   models?: Model[]
 }) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState<Message[]>(savedMessages)
+  const [data, setData] = useState<JSONValue[]>()
   const [isAtBottom, setIsAtBottom] = useState(true)
+  const [selectedModel, setSelectedModel] = useState<Model | undefined>(models?.[0])
+  const [selectedProvider, setSelectedProvider] = useState<string>()
+  const [isStreaming, setIsStreaming] = useState(false)
+  const [isToolCalling, setIsToolCalling] = useState(false)
+  const [isManualToolStream, setIsManualToolStream] = useState(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const {
-    messages,
     input,
     handleInputChange,
     handleSubmit,
-    status,
-    setMessages,
+    isLoading,
     stop,
     append,
-    data,
-    setData,
-    addToolResult,
-    reload
+    reload,
+    addToolResult
   } = useChat({
+    id,
     initialMessages: savedMessages,
-    id: CHAT_ID,
-    body: {
-      id
-    },
     onResponse: response => {
-      // Get the chat ID from response headers if this is a new chat
-      if (id === 'new') {
-        const chatId = response.headers.get('X-Chat-ID')
-        if (chatId) {
-          window.history.replaceState({}, '', `/search/${chatId}`)
-        }
+      if ('data' in response) {
+        setData(response.data as JSONValue[])
       }
     },
     onFinish: () => {
-      // Only update URL if we're not in a new chat
-      if (id !== 'new') {
-        window.history.replaceState({}, '', `/search/${id}`)
-      }
-      window.dispatchEvent(new CustomEvent('chat-history-updated'))
+      setIsStreaming(false)
+      setIsToolCalling(false)
+      setIsManualToolStream(false)
     },
     onError: error => {
-      toast.error(`Error in chat: ${error.message}`)
-    },
-    sendExtraMessageFields: false,
-    experimental_throttle: 100
+      toast.error(error.message)
+      setIsStreaming(false)
+      setIsToolCalling(false)
+      setIsManualToolStream(false)
+    }
   })
 
   // Listen for new chat creation and reset state
@@ -87,8 +82,6 @@ export function Chat({
       window.removeEventListener('new-chat-created', handleNewChat)
     }
   }, [setMessages, setData, stop])
-
-  const isLoading = status === 'submitted' || status === 'streaming'
 
   // Convert messages array to sections array
   const sections = useMemo<ChatSection[]>(() => {
@@ -245,17 +238,28 @@ export function Chat({
         reload={handleReloadFrom}
       />
       <ChatPanel
+        id={id}
         input={input}
         handleInputChange={handleInputChange}
         handleSubmit={onSubmit}
-        isLoading={isLoading}
         messages={messages}
         setMessages={setMessages}
+        isLoading={isLoading}
         stop={stop}
-        query={query}
         append={append}
-        models={models}
-        showScrollToBottomButton={!isAtBottom}
+        reload={handleReloadFrom}
+        selectedModel={selectedModel}
+        setSelectedModel={setSelectedModel}
+        selectedProvider={selectedProvider}
+        setSelectedProvider={setSelectedProvider}
+        isStreaming={isStreaming}
+        setIsStreaming={setIsStreaming}
+        isToolCalling={isToolCalling}
+        setIsToolCalling={setIsToolCalling}
+        isManualToolStream={isManualToolStream}
+        setIsManualToolStream={setIsManualToolStream}
+        isAuthenticated={isAuthenticated}
+        isAuthLoading={isAuthLoading}
         scrollContainerRef={scrollContainerRef}
       />
     </div>
