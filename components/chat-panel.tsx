@@ -568,6 +568,28 @@ export function ChatPanel({
                   <div className="p-4 text-sm text-muted-foreground">
                     Sign in to start chatting
                   </div>
+                  <div className="pl-2 pr-4 pb-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+                      disabled={isGeneratingPrompt || input.trim().length === 0}
+                    >
+                      {isGeneratingPrompt ? (
+                        <>
+                          <Spinner className="size-4" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="size-4" />
+                          Craft Super Prompt
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </AuthPrompt>
               )}
               <div className="flex items-center justify-between p-3">
@@ -605,16 +627,6 @@ export function ChatPanel({
             </div>
           </form>
           <div className="flex gap-2 mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
-            >
-              <Sparkles className="size-4" />
-              Craft Super Prompt
-            </Button>
             <Button
               type="button"
               variant="outline"
@@ -698,6 +710,28 @@ export function ChatPanel({
                 <div className="p-4 text-sm text-muted-foreground">
                   Sign in to continue chatting
                 </div>
+                <div className="pl-2 pr-4 pb-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                    onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+                    disabled={isGeneratingPrompt || input.trim().length === 0}
+                  >
+                    {isGeneratingPrompt ? (
+                      <>
+                        <Spinner className="size-4" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="size-4" />
+                        Craft Super Prompt
+                      </>
+                    )}
+                  </Button>
+                </div>
               </AuthPrompt>
             )}
 
@@ -754,16 +788,6 @@ export function ChatPanel({
             />
           )}
           <div className="flex gap-2 mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
-            >
-              <Sparkles className="size-4" />
-              Craft Super Prompt
-            </Button>
             <Button
               type="button"
               variant="outline"
