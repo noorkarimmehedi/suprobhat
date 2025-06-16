@@ -1,5 +1,7 @@
 'use client'
 
+import { AuthPrompt } from '@/components/auth-prompt'
+import { SignInDialog } from '@/components/sign-in-dialog'
 import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
@@ -10,13 +12,11 @@ import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
 import { toast } from 'sonner'
 import { useArtifact } from './artifact/artifact-context'
-import { AuthPrompt } from './auth-prompt'
 import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
 import { Button } from './ui/button'
 import { TextHoverEffect } from './ui/hover-text-effect'
-import { Spinner } from './ui/spinner'
 
 interface ChatPanelProps {
   input: string
@@ -33,6 +33,8 @@ interface ChatPanelProps {
   showScrollToBottomButton: boolean
   /** Reference to the scroll container */
   scrollContainerRef: React.RefObject<HTMLDivElement>
+  showSignInDialog: boolean
+  setShowSignInDialog: (show: boolean) => void
 }
 
 const SUPER_PROMPT = `You are a Prompt Generator, specializing in creating well-structured, verifiable, and low-hallucination prompts for any desired use case. Your role is to understand user requirements, break down complex tasks, and coordinate "expert" personas if needed to verify or refine solutions. You can ask clarifying questions when critical details are missing. Otherwise, minimize friction.
@@ -328,7 +330,9 @@ export function ChatPanel({
   append,
   models,
   showScrollToBottomButton,
-  scrollContainerRef
+  scrollContainerRef,
+  showSignInDialog,
+  setShowSignInDialog
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -455,6 +459,14 @@ export function ChatPanel({
     } as React.ChangeEvent<HTMLTextAreaElement>)
   }
 
+  const handleCraftButtonClick = (handler: () => void) => {
+    if (!isAuthenticated) {
+      setShowSignInDialog(true)
+      return
+    }
+    handler()
+  }
+
   const renderInput = () => (
     <Textarea
       ref={inputRef}
@@ -501,6 +513,104 @@ export function ChatPanel({
     </div>
   )
 
+  const renderCraftButtons = () => {
+    const buttons = (
+      <div className="flex gap-2 mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={handleCraftSuperPrompt}
+        >
+          <Sparkles className="size-4" />
+          Craft Super Prompt
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={handleCraftTweets}
+        >
+          <Twitter className="size-4" />
+          Craft Great Tweets
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={handleCraftVideoScript}
+        >
+          <Video className="size-4" />
+          Craft Great Video Script
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={handleCraftLinkedInPost}
+        >
+          <Linkedin className="size-4" />
+          Craft Great LinkedIn Posts
+        </Button>
+      </div>
+    )
+
+    if (!isAuthenticated) {
+      return (
+        <AuthPrompt trigger={buttons}>
+          <div className="flex gap-2 mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleCraftSuperPrompt}
+            >
+              <Sparkles className="size-4" />
+              Craft Super Prompt
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleCraftTweets}
+            >
+              <Twitter className="size-4" />
+              Craft Great Tweets
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleCraftVideoScript}
+            >
+              <Video className="size-4" />
+              Craft Great Video Script
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleCraftLinkedInPost}
+            >
+              <Linkedin className="size-4" />
+              Craft Great LinkedIn Posts
+            </Button>
+          </div>
+        </AuthPrompt>
+      )
+    }
+
+    return buttons
+  }
+
   if (isAuthLoading) {
     return null // or a loading spinner if you prefer
   }
@@ -529,26 +639,7 @@ export function ChatPanel({
                 <>
                   {renderInput()}
                   <div className="pl-2 pr-4 pb-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                      onClick={handleCraftSuperPrompt}
-                      disabled={isGeneratingPrompt || input.trim().length === 0}
-                    >
-                      {isGeneratingPrompt ? (
-                        <>
-                          <Spinner className="size-4" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="size-4" />
-                          Craft Super Prompt
-                        </>
-                      )}
-                    </Button>
+                    {renderCraftButtons()}
                   </div>
                 </>
               ) : (
@@ -592,40 +683,6 @@ export function ChatPanel({
               </div>
             </div>
           </form>
-          {isAuthenticated && (
-            <div className="flex gap-2 mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleCraftTweets}
-              >
-                <Twitter className="size-4" />
-                Craft Great Tweets
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleCraftVideoScript}
-              >
-                <Video className="size-4" />
-                Craft Great Video Script
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleCraftLinkedInPost}
-              >
-                <Linkedin className="size-4" />
-                Craft Great LinkedIn Posts
-              </Button>
-            </div>
-          )}
         </div>
       ) : (
         <form
@@ -651,26 +708,7 @@ export function ChatPanel({
               <>
                 {renderInput()}
                 <div className="pl-2 pr-4 pb-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                    onClick={handleCraftSuperPrompt}
-                    disabled={isGeneratingPrompt || input.trim().length === 0}
-                  >
-                    {isGeneratingPrompt ? (
-                      <>
-                        <Spinner className="size-4" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="size-4" />
-                        Craft Super Prompt
-                      </>
-                    )}
-                  </Button>
+                  {renderCraftButtons()}
                 </div>
               </>
             ) : (
@@ -733,42 +771,12 @@ export function ChatPanel({
               className={cn(showEmptyScreen ? 'visible' : 'invisible')}
             />
           )}
-          {isAuthenticated && (
-            <div className="flex gap-2 mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleCraftTweets}
-              >
-                <Twitter className="size-4" />
-                Craft Great Tweets
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleCraftVideoScript}
-              >
-                <Video className="size-4" />
-                Craft Great Video Script
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleCraftLinkedInPost}
-              >
-                <Linkedin className="size-4" />
-                Craft Great LinkedIn Posts
-              </Button>
-            </div>
-          )}
         </form>
       )}
+      <SignInDialog
+        open={showSignInDialog}
+        onOpenChange={setShowSignInDialog}
+      />
     </div>
   )
 }
