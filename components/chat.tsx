@@ -246,7 +246,6 @@ export function Chat({
           scrollContainerRef={scrollContainerRef}
           onUpdateMessage={handleUpdateAndReloadMessage}
           reload={handleReloadFrom}
-          stop={stop}
         />
       </div>
       <ChatPanel
