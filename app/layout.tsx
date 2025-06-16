@@ -1,5 +1,6 @@
 import ArtifactRoot from '@/components/artifact/artifact-root'
 import Header from '@/components/header'
+import { PageTransition } from '@/components/page-transition'
 import { ThemeProvider } from '@/components/theme-provider'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
@@ -77,7 +78,9 @@ export default async function RootLayout({
             <div className="flex flex-col flex-1">
               <Header user={user} />
               <main className="flex flex-1 min-h-0">
-                <ArtifactRoot>{children}</ArtifactRoot>
+                <ArtifactRoot>
+                  <PageTransition>{children}</PageTransition>
+                </ArtifactRoot>
               </main>
             </div>
             <Toaster />
