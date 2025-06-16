@@ -1,47 +1,40 @@
 'use client'
 
-import { AuthPrompt } from '@/components/auth-prompt'
 import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
-import { ChatRequestOptions, Message } from 'ai'
+import { Message } from 'ai'
 import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Twitter, Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
 import { toast } from 'sonner'
 import { useArtifact } from './artifact/artifact-context'
+import { AuthPrompt } from './auth-prompt'
 import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
 import { Button } from './ui/button'
 import { TextHoverEffect } from './ui/hover-text-effect'
+import { Spinner } from './ui/spinner'
 
 interface ChatPanelProps {
-  id: string
   input: string
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   isLoading: boolean
   messages: Message[]
   setMessages: (messages: Message[]) => void
+  query?: string
   stop: () => void
   append: (message: any) => void
-  reload: (messageId: string, options?: ChatRequestOptions) => Promise<string | null | undefined>
-  selectedModel?: Model
-  setSelectedModel?: (model: Model) => void
-  selectedProvider?: string
-  setSelectedProvider?: (provider: string) => void
-  isStreaming?: boolean
-  setIsStreaming?: (isStreaming: boolean) => void
-  isToolCalling?: boolean
-  setIsToolCalling?: (isToolCalling: boolean) => void
-  isManualToolStream?: boolean
-  setIsManualToolStream?: (isManualToolStream: boolean) => void
-  isAuthenticated?: boolean
-  isAuthLoading?: boolean
+  models?: Model[]
+  /** Whether to show the scroll to bottom button */
+  showScrollToBottomButton: boolean
   /** Reference to the scroll container */
   scrollContainerRef: React.RefObject<HTMLDivElement>
+  showSignInPopup: boolean
+  setShowSignInPopup: (show: boolean) => void
 }
 
 const SUPER_PROMPT = `You are a Prompt Generator, specializing in creating well-structured, verifiable, and low-hallucination prompts for any desired use case. Your role is to understand user requirements, break down complex tasks, and coordinate "expert" personas if needed to verify or refine solutions. You can ask clarifying questions when critical details are missing. Otherwise, minimize friction.
@@ -326,34 +319,23 @@ const GPT4_MODEL = {
 } as const
 
 export function ChatPanel({
-  id,
   input,
   handleInputChange,
   handleSubmit,
   isLoading,
   messages,
   setMessages,
+  query,
   stop,
   append,
-  reload,
-  selectedModel,
-  setSelectedModel,
-  selectedProvider,
-  setSelectedProvider,
-  isStreaming,
-  setIsStreaming,
-  isToolCalling,
-  setIsToolCalling,
-  isManualToolStream,
-  setIsManualToolStream,
-  isAuthenticated: propIsAuthenticated,
-  isAuthLoading: propIsAuthLoading,
-  scrollContainerRef
+  models,
+  showScrollToBottomButton,
+  scrollContainerRef,
+  showSignInPopup,
+  setShowSignInPopup
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
-  const { isAuthenticated: hookIsAuthenticated, isLoading: hookIsAuthLoading } = useAuth()
-  const isAuthenticated = propIsAuthenticated ?? hookIsAuthenticated
-  const isAuthLoading = propIsAuthLoading ?? hookIsAuthLoading
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const router = useRouter()
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const isFirstRender = useRef(true)
@@ -361,7 +343,6 @@ export function ChatPanel({
   const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
   const { close: closeArtifact } = useArtifact()
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false)
-  const [isAtBottom, setIsAtBottom] = useState(true)
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -396,15 +377,15 @@ export function ChatPanel({
 
   // if query is not empty, submit the query
   useEffect(() => {
-    if (isFirstRender.current && input && input.trim().length > 0) {
+    if (isFirstRender.current && query && query.trim().length > 0) {
       append({
         role: 'user',
-        content: input
+        content: query
       })
       isFirstRender.current = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [input])
+  }, [query])
 
   // Scroll to the bottom of the container
   const handleScrollToBottom = () => {
@@ -416,27 +397,6 @@ export function ChatPanel({
       })
     }
   }
-
-  // Detect if scroll container is at the bottom
-  useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container) return
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      const threshold = 50 // threshold in pixels
-      if (scrollHeight - scrollTop - clientHeight < threshold) {
-        setIsAtBottom(true)
-      } else {
-        setIsAtBottom(false)
-      }
-    }
-
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // Set initial state
-
-    return () => container.removeEventListener('scroll', handleScroll)
-  }, [])
 
   const generateSuperPrompt = async (userInput: string) => {
     try {
@@ -473,6 +433,14 @@ export function ChatPanel({
     }
   }
 
+  const handleCraftButtonClick = (handler: () => void) => {
+    if (!isAuthenticated) {
+      setShowSignInPopup(true)
+      return
+    }
+    handler()
+  }
+
   const handleCraftSuperPrompt = () => {
     if (input.trim().length === 0) {
       toast.error('Please enter some text first')
@@ -497,13 +465,6 @@ export function ChatPanel({
     handleInputChange({
       target: { value: LINKEDIN_POST_PROMPT }
     } as React.ChangeEvent<HTMLTextAreaElement>)
-  }
-
-  const handleCraftButtonClick = (handler: () => void) => {
-    if (!isAuthenticated) {
-      return
-    }
-    handler()
   }
 
   const renderInput = () => (
@@ -547,69 +508,10 @@ export function ChatPanel({
 
   const renderModelSelector = () => (
     <div className="flex items-center gap-2">
-      <ModelSelector models={selectedModel ? [selectedModel] : []} />
+      <ModelSelector models={models || []} />
       <SearchModeToggle />
     </div>
   )
-
-  const renderCraftButtons = () => {
-    const buttons = (
-      <div className="flex gap-2 mt-4">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          onClick={handleCraftSuperPrompt}
-        >
-          <Sparkles className="size-4" />
-          Craft Super Prompt
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          onClick={handleCraftTweets}
-        >
-          <Twitter className="size-4" />
-          Craft Great Tweets
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          onClick={handleCraftVideoScript}
-        >
-          <Video className="size-4" />
-          Craft Great Video Script
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          onClick={handleCraftLinkedInPost}
-        >
-          <Linkedin className="size-4" />
-          Craft Great LinkedIn Posts
-        </Button>
-      </div>
-    )
-
-    if (!isAuthenticated) {
-      return (
-        <AuthPrompt trigger={buttons}>
-          <div className="p-4 text-sm text-muted-foreground">
-            Sign in to use the craft buttons
-          </div>
-        </AuthPrompt>
-      )
-    }
-
-    return buttons
-  }
 
   if (isAuthLoading) {
     return null // or a loading spinner if you prefer
@@ -639,7 +541,26 @@ export function ChatPanel({
                 <>
                   {renderInput()}
                   <div className="pl-2 pr-4 pb-2">
-                    {renderCraftButtons()}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+                      disabled={isGeneratingPrompt || input.trim().length === 0}
+                    >
+                      {isGeneratingPrompt ? (
+                        <>
+                          <Spinner className="size-4" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="size-4" />
+                          Craft Super Prompt
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </>
               ) : (
@@ -683,14 +604,56 @@ export function ChatPanel({
               </div>
             </div>
           </form>
+          <div className="flex gap-2 mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+            >
+              <Sparkles className="size-4" />
+              Craft Super Prompt
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftTweets)}
+            >
+              <Twitter className="size-4" />
+              Craft Great Tweets
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
+            >
+              <Video className="size-4" />
+              Craft Great Video Script
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
+            >
+              <Linkedin className="size-4" />
+              Craft Great LinkedIn Posts
+            </Button>
+          </div>
         </div>
       ) : (
         <form
           onSubmit={handleSubmit}
           className={cn('w-full max-w-3xl mx-auto relative')}
         >
-          {/* Scroll to bottom button - only shown when not at bottom */}
-          {!isAtBottom && messages.length > 0 && (
+          {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
+          {showScrollToBottomButton && messages.length > 0 && (
             <Button
               type="button"
               variant="outline"
@@ -708,7 +671,26 @@ export function ChatPanel({
               <>
                 {renderInput()}
                 <div className="pl-2 pr-4 pb-2">
-                  {renderCraftButtons()}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                    onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+                    disabled={isGeneratingPrompt || input.trim().length === 0}
+                  >
+                    {isGeneratingPrompt ? (
+                      <>
+                        <Spinner className="size-4" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="size-4" />
+                        Craft Super Prompt
+                      </>
+                    )}
+                  </Button>
                 </div>
               </>
             ) : (
@@ -771,6 +753,48 @@ export function ChatPanel({
               className={cn(showEmptyScreen ? 'visible' : 'invisible')}
             />
           )}
+          <div className="flex gap-2 mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+            >
+              <Sparkles className="size-4" />
+              Craft Super Prompt
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftTweets)}
+            >
+              <Twitter className="size-4" />
+              Craft Great Tweets
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
+            >
+              <Video className="size-4" />
+              Craft Great Video Script
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
+            >
+              <Linkedin className="size-4" />
+              Craft Great LinkedIn Posts
+            </Button>
+          </div>
         </form>
       )}
     </div>
