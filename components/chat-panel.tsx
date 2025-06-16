@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
-import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Twitter, Video } from 'lucide-react'
+import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
@@ -16,6 +16,7 @@ import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
 import { Button } from './ui/button'
 import { TextHoverEffect } from './ui/hover-text-effect'
+import { ShineButton } from './ui/shine-button'
 import { Spinner } from './ui/spinner'
 
 interface ChatPanelProps {
@@ -609,16 +610,13 @@ export function ChatPanel({
             </div>
           </form>
           <div className="flex gap-2 mt-4">
-            <Button
+            <ShineButton
               type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
+              iconUrl="https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftTweets)}
             >
-              <Twitter className="size-4" />
               Craft Great Tweets
-            </Button>
+            </ShineButton>
             <Button
               type="button"
               variant="outline"
