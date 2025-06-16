@@ -723,38 +723,6 @@ export function ChatPanel({
               className={cn(showEmptyScreen ? 'visible' : 'invisible')}
             />
           )}
-          <div className="flex gap-2 mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => handleCraftButtonClick(handleCraftTweets)}
-            >
-              <Twitter className="size-4" />
-              Craft Great Tweets
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
-            >
-              <Video className="size-4" />
-              Craft Great Video Script
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
-            >
-              <Linkedin className="size-4" />
-              Craft Great LinkedIn Posts
-            </Button>
-          </div>
         </form>
       )}
     </div>
