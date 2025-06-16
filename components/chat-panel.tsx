@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { Message } from 'ai'
 import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Twitter, Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
 import { toast } from 'sonner'
 import { useArtifact } from './artifact/artifact-context'
@@ -339,28 +339,28 @@ export function ChatPanel({
   const router = useRouter()
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const isFirstRender = useRef(true)
-  const [isComposing, setIsComposing] = useState(false)
-  const [enterDisabled, setEnterDisabled] = useState(false)
+  const [isComposing, setIsComposing] = useState(false) // Composition state
+  const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
   const { close: closeArtifact } = useArtifact()
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false)
 
-  const handleCompositionStart = useCallback(() => setIsComposing(true), [])
+  const handleCompositionStart = () => setIsComposing(true)
 
-  const handleCompositionEnd = useCallback(() => {
+  const handleCompositionEnd = () => {
     setIsComposing(false)
     setEnterDisabled(true)
     setTimeout(() => {
       setEnterDisabled(false)
     }, 300)
-  }, [])
+  }
 
-  const handleNewChat = useCallback(() => {
+  const handleNewChat = () => {
     setMessages([])
     closeArtifact()
     router.push('/')
-  }, [setMessages, closeArtifact, router])
+  }
 
-  const isToolInvocationInProgress = useCallback(() => {
+  const isToolInvocationInProgress = () => {
     if (!messages.length) return false
 
     const lastMessage = messages[messages.length - 1]
@@ -373,61 +373,57 @@ export function ChatPanel({
       lastPart?.type === 'tool-invocation' &&
       lastPart?.toolInvocation?.state === 'call'
     )
-  }, [messages])
+  }
 
-  const handleInputChangeWithEmptyScreen = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleInputChange(e)
-    setShowEmptyScreen(e.target.value.length === 0)
-  }, [handleInputChange])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (
-      e.key === 'Enter' &&
-      !e.shiftKey &&
-      !isComposing &&
-      !enterDisabled
-    ) {
-      if (input.trim().length === 0) {
-        e.preventDefault()
-        return
-      }
-      e.preventDefault()
-      const textarea = e.target as HTMLTextAreaElement
-      textarea.form?.requestSubmit()
+  // if query is not empty, submit the query
+  useEffect(() => {
+    if (isFirstRender.current && query && query.trim().length > 0) {
+      append({
+        role: 'user',
+        content: query
+      })
+      isFirstRender.current = false
     }
-  }, [input, isComposing, enterDisabled])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
 
-  const handleFocus = useCallback(() => setShowEmptyScreen(true), [])
-  const handleBlur = useCallback(() => setShowEmptyScreen(false), [])
-
-  const handleCraftButtonClick = useCallback((handler: () => void) => {
-    if (!isAuthenticated) {
-      setShowSignInPopup(true)
-      return
+  // Scroll to the bottom of the container
+  const handleScrollToBottom = () => {
+    const scrollContainer = scrollContainerRef.current
+    if (scrollContainer) {
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: 'smooth'
+      })
     }
-    handler()
-  }, [isAuthenticated, setShowSignInPopup])
+  }
 
-  const handleCraftSuperPrompt = useCallback(async () => {
-    if (input.trim().length === 0) {
-      toast.error('Please enter some text first')
-      return
-    }
+  const generateSuperPrompt = async (userInput: string) => {
     try {
       setIsGeneratingPrompt(true)
+
       const response = await fetch('/api/generate-super-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ input }),
+        body: JSON.stringify({ input: userInput }),
       })
-      if (!response.ok) throw new Error('Failed to generate super prompt')
+
+      if (!response.ok) {
+        throw new Error('Failed to generate super prompt')
+      }
+
       const { prompt } = await response.json()
-      if (!prompt) throw new Error('No prompt was generated')
+
+      if (!prompt) {
+        throw new Error('No prompt was generated')
+      }
+
       handleInputChange({
         target: { value: prompt }
       } as React.ChangeEvent<HTMLTextAreaElement>)
+
       toast.success('Super prompt generated!')
     } catch (error) {
       console.error('Error generating super prompt:', error)
@@ -435,27 +431,43 @@ export function ChatPanel({
     } finally {
       setIsGeneratingPrompt(false)
     }
-  }, [input, handleInputChange])
+  }
 
-  const handleCraftTweets = useCallback(() => {
+  const handleCraftButtonClick = (handler: () => void) => {
+    if (!isAuthenticated) {
+      setShowSignInPopup(true)
+      return
+    }
+    handler()
+  }
+
+  const handleCraftSuperPrompt = () => {
+    if (input.trim().length === 0) {
+      toast.error('Please enter some text first')
+      return
+    }
+    generateSuperPrompt(input)
+  }
+
+  const handleCraftTweets = () => {
     handleInputChange({
       target: { value: TWEET_PROMPT }
     } as React.ChangeEvent<HTMLTextAreaElement>)
-  }, [handleInputChange])
+  }
 
-  const handleCraftVideoScript = useCallback(() => {
+  const handleCraftVideoScript = () => {
     handleInputChange({
       target: { value: VIDEO_SCRIPT_PROMPT }
     } as React.ChangeEvent<HTMLTextAreaElement>)
-  }, [handleInputChange])
+  }
 
-  const handleCraftLinkedInPost = useCallback(() => {
+  const handleCraftLinkedInPost = () => {
     handleInputChange({
       target: { value: LINKEDIN_POST_PROMPT }
     } as React.ChangeEvent<HTMLTextAreaElement>)
-  }, [handleInputChange])
+  }
 
-  const renderInput = useMemo(() => (
+  const renderInput = () => (
     <Textarea
       ref={inputRef}
       name="input"
@@ -469,23 +481,41 @@ export function ChatPanel({
       value={input}
       disabled={isLoading || isToolInvocationInProgress()}
       className="resize-none w-full h-[52px] min-h-[52px] bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-      onChange={handleInputChangeWithEmptyScreen}
-      onKeyDown={handleKeyDown}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      onChange={e => {
+        handleInputChange(e)
+        setShowEmptyScreen(e.target.value.length === 0)
+      }}
+      onKeyDown={e => {
+        if (
+          e.key === 'Enter' &&
+          !e.shiftKey &&
+          !isComposing &&
+          !enterDisabled
+        ) {
+          if (input.trim().length === 0) {
+            e.preventDefault()
+            return
+          }
+          e.preventDefault()
+          const textarea = e.target as HTMLTextAreaElement
+          textarea.form?.requestSubmit()
+        }
+      }}
+      onFocus={() => setShowEmptyScreen(true)}
+      onBlur={() => setShowEmptyScreen(false)}
     />
-  ), [input, isLoading, handleCompositionStart, handleCompositionEnd, handleInputChangeWithEmptyScreen, handleKeyDown, handleFocus, handleBlur, isToolInvocationInProgress])
+  )
 
-  const renderModelSelector = useMemo(() => (
+  const renderModelSelector = () => (
     <div className="flex items-center gap-2">
       <ModelSelector models={models || []} />
       <SearchModeToggle />
     </div>
-  ), [models])
+  )
 
-  const renderInputWithSuperPrompt = useMemo(() => (
+  const renderInputWithSuperPrompt = () => (
     <>
-      {renderInput}
+      {renderInput()}
       <div className="pl-2 pr-4 pb-2">
         <Button
           type="button"
@@ -509,32 +539,10 @@ export function ChatPanel({
         </Button>
       </div>
     </>
-  ), [renderInput, isGeneratingPrompt, input, handleCraftButtonClick, handleCraftSuperPrompt])
-
-  // if query is not empty, submit the query
-  useEffect(() => {
-    if (isFirstRender.current && query && query.trim().length > 0) {
-      append({
-        role: 'user',
-        content: query
-      })
-      isFirstRender.current = false
-    }
-  }, [query, append])
-
-  // Scroll to the bottom of the container
-  const handleScrollToBottom = () => {
-    const scrollContainer = scrollContainerRef.current
-    if (scrollContainer) {
-      scrollContainer.scrollTo({
-        top: scrollContainer.scrollHeight,
-        behavior: 'smooth'
-      })
-    }
-  }
+  )
 
   if (isAuthLoading) {
-    return null
+    return null // or a loading spinner if you prefer
   }
 
   return (
@@ -558,9 +566,9 @@ export function ChatPanel({
           >
             <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
               {isAuthenticated ? (
-                renderInputWithSuperPrompt
+                renderInputWithSuperPrompt()
               ) : (
-                <AuthPrompt trigger={renderInputWithSuperPrompt}>
+                <AuthPrompt trigger={renderInputWithSuperPrompt()}>
                   <div className="p-4 text-sm text-muted-foreground">
                     Sign in to start chatting
                   </div>
@@ -568,9 +576,9 @@ export function ChatPanel({
               )}
               <div className="flex items-center justify-between p-3">
                 {isAuthenticated ? (
-                  renderModelSelector
+                  renderModelSelector()
                 ) : (
-                  <AuthPrompt trigger={renderModelSelector}>
+                  <AuthPrompt trigger={renderModelSelector()}>
                     <div className="text-sm text-muted-foreground">
                       Sign in to select a model
                     </div>
@@ -638,6 +646,7 @@ export function ChatPanel({
           onSubmit={handleSubmit}
           className={cn('w-full max-w-3xl mx-auto relative')}
         >
+          {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
           {showScrollToBottomButton && messages.length > 0 && (
             <Button
               type="button"
@@ -653,20 +662,21 @@ export function ChatPanel({
 
           <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
             {isAuthenticated ? (
-              renderInputWithSuperPrompt
+              renderInputWithSuperPrompt()
             ) : (
-              <AuthPrompt trigger={renderInputWithSuperPrompt}>
+              <AuthPrompt trigger={renderInputWithSuperPrompt()}>
                 <div className="p-4 text-sm text-muted-foreground">
                   Sign in to continue chatting
                 </div>
               </AuthPrompt>
             )}
 
+            {/* Bottom menu area */}
             <div className="flex items-center justify-between p-3">
               {isAuthenticated ? (
-                renderModelSelector
+                renderModelSelector()
               ) : (
-                <AuthPrompt trigger={renderModelSelector}>
+                <AuthPrompt trigger={renderModelSelector()}>
                   <div className="text-sm text-muted-foreground">
                     Sign in to select a model
                   </div>

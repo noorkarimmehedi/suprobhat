@@ -9,6 +9,13 @@ interface PageTransitionProps {
 
 export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname()
+  
+  // Only apply animation for home page and auth pages
+  const shouldAnimate = pathname === '/' || pathname.startsWith('/auth/')
+
+  if (!shouldAnimate) {
+    return <>{children}</>
+  }
 
   return (
     <AnimatePresence mode="wait">
