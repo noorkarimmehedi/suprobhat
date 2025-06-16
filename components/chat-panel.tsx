@@ -1,7 +1,6 @@
 'use client'
 
 import { AuthPrompt } from '@/components/auth-prompt'
-import { SignInDialog } from '@/components/sign-in-dialog'
 import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
@@ -562,47 +561,8 @@ export function ChatPanel({
     if (!isAuthenticated) {
       return (
         <AuthPrompt trigger={buttons}>
-          <div className="flex gap-2 mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={handleCraftSuperPrompt}
-            >
-              <Sparkles className="size-4" />
-              Craft Super Prompt
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={handleCraftTweets}
-            >
-              <Twitter className="size-4" />
-              Craft Great Tweets
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={handleCraftVideoScript}
-            >
-              <Video className="size-4" />
-              Craft Great Video Script
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={handleCraftLinkedInPost}
-            >
-              <Linkedin className="size-4" />
-              Craft Great LinkedIn Posts
-            </Button>
+          <div className="p-4 text-sm text-muted-foreground">
+            Sign in to use the craft buttons
           </div>
         </AuthPrompt>
       )
@@ -773,7 +733,7 @@ export function ChatPanel({
           )}
         </form>
       )}
-      <SignInDialog
+      <AuthPrompt
         open={showSignInDialog}
         onOpenChange={setShowSignInDialog}
       />
