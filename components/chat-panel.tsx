@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
-import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Video } from 'lucide-react'
+import { ArrowUp, ChevronDown, MessageCirclePlus, Sparkles, Square } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
@@ -617,26 +617,20 @@ export function ChatPanel({
             >
               Craft Great Tweets
             </ShineButton>
-            <Button
+            <ShineButton
               type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
+              iconUrl="https://img.icons8.com/?size=100&id=5NvZIXB49iQB&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
             >
-              <Video className="size-4" />
               Craft Great Video Script
-            </Button>
-            <Button
+            </ShineButton>
+            <ShineButton
               type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
+              iconUrl="https://img.icons8.com/?size=100&id=8808&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
             >
-              <Linkedin className="size-4" />
               Craft Great LinkedIn Posts
-            </Button>
+            </ShineButton>
           </div>
         </div>
       ) : (
