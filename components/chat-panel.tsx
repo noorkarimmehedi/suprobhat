@@ -460,7 +460,6 @@ export function ChatPanel({
 
   const handleCraftButtonClick = (handler: () => void) => {
     if (!isAuthenticated) {
-      setShowSignInDialog(true)
       return
     }
     handler()
@@ -733,10 +732,6 @@ export function ChatPanel({
           )}
         </form>
       )}
-      <AuthPrompt
-        open={showSignInDialog}
-        onOpenChange={setShowSignInDialog}
-      />
     </div>
   )
 }
