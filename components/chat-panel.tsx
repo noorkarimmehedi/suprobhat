@@ -513,6 +513,34 @@ export function ChatPanel({
     </div>
   )
 
+  const renderInputWithSuperPrompt = () => (
+    <>
+      {renderInput()}
+      <div className="pl-2 pr-4 pb-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+          onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+          disabled={isGeneratingPrompt || input.trim().length === 0}
+        >
+          {isGeneratingPrompt ? (
+            <>
+              <Spinner className="size-4" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="size-4" />
+              Craft Super Prompt
+            </>
+          )}
+        </Button>
+      </div>
+    </>
+  )
+
   if (isAuthLoading) {
     return null // or a loading spinner if you prefer
   }
@@ -538,57 +566,11 @@ export function ChatPanel({
           >
             <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
               {isAuthenticated ? (
-                <>
-                  {renderInput()}
-                  <div className="pl-2 pr-4 pb-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                      onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
-                      disabled={isGeneratingPrompt || input.trim().length === 0}
-                    >
-                      {isGeneratingPrompt ? (
-                        <>
-                          <Spinner className="size-4" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="size-4" />
-                          Craft Super Prompt
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </>
+                renderInputWithSuperPrompt()
               ) : (
-                <AuthPrompt trigger={renderInput()}>
+                <AuthPrompt trigger={renderInputWithSuperPrompt()}>
                   <div className="p-4 text-sm text-muted-foreground">
                     Sign in to start chatting
-                  </div>
-                  <div className="pl-2 pr-4 pb-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                      onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
-                      disabled={isGeneratingPrompt || input.trim().length === 0}
-                    >
-                      {isGeneratingPrompt ? (
-                        <>
-                          <Spinner className="size-4" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="size-4" />
-                          Craft Super Prompt
-                        </>
-                      )}
-                    </Button>
                   </div>
                 </AuthPrompt>
               )}
@@ -680,57 +662,11 @@ export function ChatPanel({
 
           <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
             {isAuthenticated ? (
-              <>
-                {renderInput()}
-                <div className="pl-2 pr-4 pb-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                    onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
-                    disabled={isGeneratingPrompt || input.trim().length === 0}
-                  >
-                    {isGeneratingPrompt ? (
-                      <>
-                        <Spinner className="size-4" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="size-4" />
-                        Craft Super Prompt
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </>
+              renderInputWithSuperPrompt()
             ) : (
-              <AuthPrompt trigger={renderInput()}>
+              <AuthPrompt trigger={renderInputWithSuperPrompt()}>
                 <div className="p-4 text-sm text-muted-foreground">
                   Sign in to continue chatting
-                </div>
-                <div className="pl-2 pr-4 pb-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                    onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
-                    disabled={isGeneratingPrompt || input.trim().length === 0}
-                  >
-                    {isGeneratingPrompt ? (
-                      <>
-                        <Spinner className="size-4" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="size-4" />
-                        Craft Super Prompt
-                      </>
-                    )}
-                  </Button>
                 </div>
               </AuthPrompt>
             )}
