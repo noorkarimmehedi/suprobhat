@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { useChat } from '@ai-sdk/react'
 import { ChatRequestOptions } from 'ai'
 import { Message } from 'ai/react'
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ChatMessages } from './chat-messages'
@@ -29,23 +30,23 @@ export function Chat({
   query?: string
   models?: Model[]
 }) {
+  const router = useRouter()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [showSignInPopup, setShowSignInPopup] = useState(false)
+  const [messages, setMessages] = useState<Message[]>(savedMessages)
 
   const {
-    messages,
     input,
     handleInputChange,
     handleSubmit,
     status,
-    setMessages,
-    stop,
     append,
     data,
     setData,
     addToolResult,
-    reload
+    reload,
+    stop
   } = useChat({
     initialMessages: savedMessages,
     id: CHAT_ID,
@@ -57,14 +58,14 @@ export function Chat({
       if (id === 'new') {
         const chatId = response.headers.get('X-Chat-ID')
         if (chatId) {
-          window.history.replaceState({}, '', `/search/${chatId}`)
+          window.history.replaceState({}, '', `/chat/${chatId}`)
         }
       }
     },
     onFinish: () => {
       // Only update URL if we're not in a new chat
       if (id !== 'new') {
-        window.history.replaceState({}, '', `/search/${id}`)
+        window.history.replaceState({}, '', `/chat/${id}`)
       }
       window.dispatchEvent(new CustomEvent('chat-history-updated'))
     },
@@ -234,32 +235,32 @@ export function Chat({
       )}
       data-testid="full-chat"
     >
-      <ChatMessages
-        sections={sections}
-        data={data}
-        onQuerySelect={onQuerySelect}
-        isLoading={isLoading}
-        chatId={id}
-        addToolResult={addToolResult}
-        scrollContainerRef={scrollContainerRef}
-        onUpdateMessage={handleUpdateAndReloadMessage}
-        reload={handleReloadFrom}
-      />
+      <div className="flex-1 overflow-hidden">
+        <ChatMessages
+          sections={sections}
+          data={data}
+          onQuerySelect={onQuerySelect}
+          isLoading={isLoading}
+          chatId={id}
+          addToolResult={addToolResult}
+          scrollContainerRef={scrollContainerRef}
+          onUpdateMessage={handleUpdateAndReloadMessage}
+          reload={handleReloadFrom}
+          stop={stop}
+        />
+      </div>
       <ChatPanel
+        id={id}
         input={input}
         handleInputChange={handleInputChange}
         handleSubmit={onSubmit}
         isLoading={isLoading}
-        messages={messages}
-        setMessages={setMessages}
         stop={stop}
-        query={query}
+        messages={messages}
         append={append}
-        models={models}
-        showScrollToBottomButton={!isAtBottom}
-        scrollContainerRef={scrollContainerRef}
         showSignInPopup={showSignInPopup}
         setShowSignInPopup={setShowSignInPopup}
+        reload={reload}
       />
     </div>
   )
