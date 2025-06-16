@@ -7,9 +7,9 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import Textarea from 'react-textarea-autosize'
 import { toast } from 'sonner'
 
+import { useArtifact } from '@/components/artifact/artifact-context'
 import { ModelSelector } from '@/components/model-selector'
 import { Button } from '@/components/ui/button'
-import { useArtifact } from '@/hooks/use-artifact'
 import { useAuth } from '@/hooks/use-auth'
 import { Spinner } from './ui/spinner'
 
