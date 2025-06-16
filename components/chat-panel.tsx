@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
-import { ArrowUp, ChevronDown, MessageCirclePlus, Sparkles, Square } from 'lucide-react'
+import { ArrowUp, ChevronDown, MessageCirclePlus, Sparkles, Square, Twitter } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
@@ -110,10 +110,13 @@ Reply with the following introduction:
 Await user response. Ask clarifying questions if needed, then produce the final prompt using the above structure.`
 
 const TWEET_PROMPT = `System:
+
 You are a Viral Tweet Generator assistant who guides users through generating compelling tweet ideas and crafting them into attention-grabbing, shareable content. You balance authoritative expertise with practical writing techniques, clearly separating the ideation and execution phases.
 Context:
+
 The user wants to create 30 viral tweets using proven structures and formulas. Your guidance should help them generate strong ideas and then transform those ideas into polished tweets with high engagement potential. You'll draw from established tweet patterns including strong hooks, psychological triggers, and effective structures like one-liners, reframing devices, conditional promises, and solution stacks.
 Instructions:
+
 PHASE 1: IDEATION
 Begin by asking the user to identify 3-5 broad topics they're knowledgeable or passionate about (business, relationships, productivity, health, etc.)
 For each topic, guide the user to:
@@ -125,6 +128,7 @@ Help them refine these raw ideas by:
 * Highlighting which ones have universal appeal
 * Identifying which would benefit from specific structures (one-liners, lists, etc.)
 * Suggesting how to make ordinary observations more provocative or insightful
+
 PHASE 2: EXECUTION
 For each refined idea, help the user craft a tweet using one of these effective structures:
 * The One-Liner Declaration (bold statement that challenges status quo)
@@ -137,6 +141,7 @@ For each refined idea, help the user craft a tweet using one of these effective 
 * The Reality Check (harsh truth + examples + insight)
 * The Solution/Benefit Stack (problem list + simple solution)
 * The Confident Promise (authority claim + actionable steps)
+
 For each tweet draft:
 * Polish the hook to grab attention in the first line
 * Enhance psychological impact by adding appropriate triggers
@@ -144,12 +149,14 @@ For each tweet draft:
 * Ensure proper formatting with strategic whitespace
 * Create a pattern interrupt that makes readers stop scrolling
 After each batch of 5-10 tweets, suggest variations or alternative approaches.
+
 Constraints:
 Keep tweets concise and impactful – every word must earn its place
 Avoid nuance or balanced perspectives as these don't go viral
 Use confident, authoritative language throughout
 Ensure tweets are genuine and authentic to the user's beliefs
 Focus on provoking thought, providing value, or triggering emotion
+
 Output Format:
 For each tweet, provide:
 The tweet text (formatted exactly as it should appear)
@@ -292,7 +299,6 @@ export function ChatPanel({
     handleInputChange({
       target: { value: TWEET_PROMPT }
     } as React.ChangeEvent<HTMLTextAreaElement>)
-    toast.success('Tweet crafting mode activated!')
   }
 
   const renderInput = () => (
@@ -368,7 +374,7 @@ export function ChatPanel({
               {isAuthenticated ? (
                 <>
                   {renderInput()}
-                  <div className="pl-2 pr-4 pb-2 flex flex-col gap-2">
+                  <div className="pl-2 pr-4 pb-2">
                     <Button
                       type="button"
                       variant="ghost"
@@ -388,16 +394,6 @@ export function ChatPanel({
                           Craft Super Prompt
                         </>
                       )}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-                      onClick={handleCraftTweets}
-                    >
-                      <MessageCirclePlus className="size-4" />
-                      Craft Great Tweets
                     </Button>
                   </div>
                 </>
@@ -442,6 +438,20 @@ export function ChatPanel({
               </div>
             </div>
           </form>
+          {isAuthenticated && (
+            <div className="flex gap-2 mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleCraftTweets}
+              >
+                <Twitter className="size-4" />
+                Craft Great Tweets
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <form
@@ -548,6 +558,20 @@ export function ChatPanel({
               }}
               className={cn(showEmptyScreen ? 'visible' : 'invisible')}
             />
+          )}
+          {isAuthenticated && (
+            <div className="flex gap-2 mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleCraftTweets}
+              >
+                <Twitter className="size-4" />
+                Craft Great Tweets
+              </Button>
+            </div>
           )}
         </form>
       )}
