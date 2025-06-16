@@ -1,30 +1,40 @@
 'use client'
 
-import { Message, generateId } from 'ai'
-import { Linkedin, Loader2, RefreshCw, Sparkles, StopCircle, Twitter, Video } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { Model } from '@/lib/types/models'
+import { cn } from '@/lib/utils'
+import { Message } from 'ai'
+import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Twitter, Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
 import { toast } from 'sonner'
-
-import { useArtifact } from '@/components/artifact/artifact-context'
-import { ModelSelector } from '@/components/model-selector'
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/hooks/use-auth'
+import { useArtifact } from './artifact/artifact-context'
+import { AuthPrompt } from './auth-prompt'
+import { EmptyScreen } from './empty-screen'
+import { ModelSelector } from './model-selector'
+import { SearchModeToggle } from './search-mode-toggle'
+import { Button } from './ui/button'
+import { TextHoverEffect } from './ui/hover-text-effect'
 import { Spinner } from './ui/spinner'
 
 interface ChatPanelProps {
-  id: string
   input: string
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   isLoading: boolean
-  stop: () => void
   messages: Message[]
-  append: (message: Message) => void
+  setMessages: (messages: Message[]) => void
+  query?: string
+  stop: () => void
+  append: (message: any) => void
+  models?: Model[]
+  /** Whether to show the scroll to bottom button */
+  showScrollToBottomButton: boolean
+  /** Reference to the scroll container */
+  scrollContainerRef: React.RefObject<HTMLDivElement>
   showSignInPopup: boolean
   setShowSignInPopup: (show: boolean) => void
-  reload: () => void
 }
 
 const SUPER_PROMPT = `You are a Prompt Generator, specializing in creating well-structured, verifiable, and low-hallucination prompts for any desired use case. Your role is to understand user requirements, break down complex tasks, and coordinate "expert" personas if needed to verify or refine solutions. You can ask clarifying questions when critical details are missing. Otherwise, minimize friction.
@@ -309,17 +319,20 @@ const GPT4_MODEL = {
 } as const
 
 export function ChatPanel({
-  id,
   input,
   handleInputChange,
   handleSubmit,
   isLoading,
-  stop,
   messages,
+  setMessages,
+  query,
+  stop,
   append,
+  models,
+  showScrollToBottomButton,
+  scrollContainerRef,
   showSignInPopup,
-  setShowSignInPopup,
-  reload
+  setShowSignInPopup
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -330,12 +343,6 @@ export function ChatPanel({
   const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
   const { close: closeArtifact } = useArtifact()
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false)
-  const [isPending, startTransition] = useTransition()
-  const [isCraftingTweet, setIsCraftingTweet] = useState(false)
-  const [isCraftingVideoScript, setIsCraftingVideoScript] = useState(false)
-  const [isCraftingLinkedInPost, setIsCraftingLinkedInPost] = useState(false)
-  const [isCraftingSuperPrompt, setIsCraftingSuperPrompt] = useState(false)
-  const isNewChat = id === 'new'
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -348,11 +355,7 @@ export function ChatPanel({
   }
 
   const handleNewChat = () => {
-    append({
-      id: generateId(),
-      role: 'user',
-      content: ''
-    })
+    setMessages([])
     closeArtifact()
     router.push('/')
   }
@@ -374,42 +377,59 @@ export function ChatPanel({
 
   // if query is not empty, submit the query
   useEffect(() => {
-    if (isFirstRender.current && input && input.trim().length > 0) {
+    if (isFirstRender.current && query && query.trim().length > 0) {
       append({
-        id: generateId(),
         role: 'user',
-        content: input
+        content: query
       })
       isFirstRender.current = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [input])
+  }, [query])
 
-  const generateSuperPrompt = async (userInput: string): Promise<string | null> => {
-    if (!userInput.trim()) {
-      toast.error('Please enter some text first')
-      return null
+  // Scroll to the bottom of the container
+  const handleScrollToBottom = () => {
+    const scrollContainer = scrollContainerRef.current
+    if (scrollContainer) {
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: 'smooth'
+      })
     }
+  }
 
+  const generateSuperPrompt = async (userInput: string) => {
     try {
-      const response = await fetch('/api/generate-prompt', {
+      setIsGeneratingPrompt(true)
+
+      const response = await fetch('/api/generate-super-prompt', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ input: userInput })
+        body: JSON.stringify({ input: userInput }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to generate prompt')
+        throw new Error('Failed to generate super prompt')
       }
 
-      const data = await response.json()
-      return data.prompt
+      const { prompt } = await response.json()
+
+      if (!prompt) {
+        throw new Error('No prompt was generated')
+      }
+
+      handleInputChange({
+        target: { value: prompt }
+      } as React.ChangeEvent<HTMLTextAreaElement>)
+
+      toast.success('Super prompt generated!')
     } catch (error) {
-      console.error('Error generating prompt:', error)
-      toast.error('Failed to generate prompt')
-      return null
+      console.error('Error generating super prompt:', error)
+      toast.error('Failed to generate super prompt')
+    } finally {
+      setIsGeneratingPrompt(false)
     }
   }
 
@@ -421,27 +441,12 @@ export function ChatPanel({
     handler()
   }
 
-  const handleCraftSuperPrompt = async () => {
-    if (!isAuthenticated) {
-      setShowSignInPopup(true)
+  const handleCraftSuperPrompt = () => {
+    if (input.trim().length === 0) {
+      toast.error('Please enter some text first')
       return
     }
-
-    try {
-      setIsCraftingSuperPrompt(true)
-      const prompt = await generateSuperPrompt(input)
-      if (prompt !== null) {
-        const event = {
-          target: { value: prompt }
-        } as unknown as React.ChangeEvent<HTMLTextAreaElement>
-        handleInputChange(event)
-      }
-    } catch (error) {
-      console.error('Error crafting super prompt:', error)
-      toast.error('Failed to craft super prompt')
-    } finally {
-      setIsCraftingSuperPrompt(false)
-    }
+    generateSuperPrompt(input)
   }
 
   const handleCraftTweets = () => {
@@ -503,176 +508,255 @@ export function ChatPanel({
 
   const renderModelSelector = () => (
     <div className="flex items-center gap-2">
-      <ModelSelector models={[]} />
+      <ModelSelector models={models || []} />
+      <SearchModeToggle />
     </div>
   )
 
-  const renderInputWithSuperPrompt = () => {
-    return (
-      <form onSubmit={handleSubmit} className="relative flex w-full items-center">
-        <div className="relative flex w-full flex-col">
-          <div className="relative flex w-full flex-col">
-            <Textarea
-              ref={inputRef}
-              tabIndex={0}
-              rows={1}
-              value={input}
-              onChange={handleInputChange}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && !e.shiftKey && !isComposing && !enterDisabled) {
-                  e.preventDefault()
-                  const textarea = e.target as HTMLTextAreaElement
-                  textarea.form?.requestSubmit()
-                }
-              }}
-              onCompositionStart={handleCompositionStart}
-              onCompositionEnd={handleCompositionEnd}
-              placeholder="Send a message..."
-              spellCheck={false}
-              className="min-h-[60px] w-full resize-none bg-transparent px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
-            />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={handleCraftSuperPrompt}
-                disabled={isCraftingSuperPrompt}
-              >
-                {isCraftingSuperPrompt ? (
-                  <Spinner className="h-4 w-4" />
-                ) : (
-                  <Sparkles className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </form>
-    )
-  }
+  const renderInputWithSuperPrompt = () => (
+    <>
+      {renderInput()}
+      <div className="pl-2 pr-4 pb-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+          onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+          disabled={isGeneratingPrompt || input.trim().length === 0}
+        >
+          {isGeneratingPrompt ? (
+            <>
+              <Spinner className="size-4" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="size-4" />
+              Craft Super Prompt
+            </>
+          )}
+        </Button>
+      </div>
+    </>
+  )
 
   if (isAuthLoading) {
     return null // or a loading spinner if you prefer
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 bg-gradient-to-b from-muted/10 from-10% to-muted/30 to-50%">
-      <div className="container mx-auto px-4">
-        <div className="mx-auto flex h-full max-w-2xl flex-col items-center space-y-4 py-4">
-          {messages.length > 0 && (
-            <div className="flex w-full items-center justify-center">
-              {isLoading ? (
-                <Button
-                  variant="outline"
-                  onClick={() => stop()}
-                  className="bg-background"
-                >
-                  <StopCircle className="mr-2 h-4 w-4" />
-                  Stop generating
-                </Button>
+    <div
+      className={cn(
+        'w-full bg-background group/form-container shrink-0',
+        messages.length > 0 ? 'sticky bottom-0 px-2 pb-4' : 'px-6'
+      )}
+    >
+      {messages.length === 0 ? (
+        <div className="flex flex-col items-center justify-center w-full mx-auto gap-2">
+          <div className="w-full h-[250px] flex items-center justify-center">
+            <TextHoverEffect
+              text="Arc Lab"
+              duration={0.5}
+            />
+          </div>
+          <form
+            onSubmit={handleSubmit}
+            className={cn('w-full max-w-3xl mx-auto relative')}
+          >
+            <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
+              {isAuthenticated ? (
+                renderInputWithSuperPrompt()
               ) : (
-                <div className="flex space-x-2">
+                <AuthPrompt trigger={renderInputWithSuperPrompt()}>
+                  <div className="p-4 text-sm text-muted-foreground">
+                    Sign in to start chatting
+                  </div>
+                </AuthPrompt>
+              )}
+              <div className="flex items-center justify-between p-3">
+                {isAuthenticated ? (
+                  renderModelSelector()
+                ) : (
+                  <AuthPrompt trigger={renderModelSelector()}>
+                    <div className="text-sm text-muted-foreground">
+                      Sign in to select a model
+                    </div>
+                  </AuthPrompt>
+                )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={!isAuthenticated || isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
+                    className="shrink-0 rounded-full"
+                  >
+                    <ArrowUp className="size-4" />
+                  </Button>
+                  {isLoading && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={stop}
+                      className="shrink-0 rounded-full"
+                    >
+                      <Square className="size-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </form>
+          <div className="flex gap-2 mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftTweets)}
+            >
+              <Twitter className="size-4" />
+              Craft Great Tweets
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
+            >
+              <Video className="size-4" />
+              Craft Great Video Script
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
+            >
+              <Linkedin className="size-4" />
+              Craft Great LinkedIn Posts
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className={cn('w-full max-w-3xl mx-auto relative')}
+        >
+          {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
+          {showScrollToBottomButton && messages.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="absolute -top-10 right-4 z-20 size-8 rounded-full shadow-md"
+              onClick={handleScrollToBottom}
+              title="Scroll to bottom"
+            >
+              <ChevronDown size={16} />
+            </Button>
+          )}
+
+          <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
+            {isAuthenticated ? (
+              renderInputWithSuperPrompt()
+            ) : (
+              <AuthPrompt trigger={renderInputWithSuperPrompt()}>
+                <div className="p-4 text-sm text-muted-foreground">
+                  Sign in to continue chatting
+                </div>
+              </AuthPrompt>
+            )}
+
+            {/* Bottom menu area */}
+            <div className="flex items-center justify-between p-3">
+              {isAuthenticated ? (
+                renderModelSelector()
+              ) : (
+                <AuthPrompt trigger={renderModelSelector()}>
+                  <div className="text-sm text-muted-foreground">
+                    Sign in to select a model
+                  </div>
+                </AuthPrompt>
+              )}
+              <div className="flex items-center gap-2">
+                {messages.length > 0 && (
                   <Button
                     variant="outline"
-                    onClick={() => reload()}
-                    disabled={isPending}
+                    size="icon"
+                    onClick={handleNewChat}
+                    className="shrink-0 rounded-full group"
+                    type="button"
+                    disabled={isLoading || isToolInvocationInProgress()}
                   >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Regenerate response
+                    <MessageCirclePlus className="size-4 group-hover:rotate-12 transition-all" />
                   </Button>
-                </div>
-              )}
-            </div>
-          )}
-          <div className="grid w-full gap-2">
-            {isNewChat && (
-              <div className="flex flex-wrap gap-2 justify-center mb-2">
+                )}
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 px-2 text-xs"
-                  onClick={() => handleCraftButtonClick(handleCraftTweets)}
-                  disabled={isCraftingTweet}
+                  type={isLoading ? 'button' : 'submit'}
+                  size={'icon'}
+                  variant={'outline'}
+                  className={cn(isLoading && 'animate-pulse', 'rounded-full')}
+                  disabled={
+                    !isAuthenticated ||
+                    (input.length === 0 && !isLoading) ||
+                    isToolInvocationInProgress()
+                  }
+                  onClick={isLoading ? stop : undefined}
                 >
-                  {isCraftingTweet ? (
-                    <>
-                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                      Crafting...
-                    </>
-                  ) : (
-                    <>
-                      <Twitter className="mr-1 h-3 w-3" />
-                      Craft Great Tweets
-                    </>
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 px-2 text-xs"
-                  onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
-                  disabled={isCraftingVideoScript}
-                >
-                  {isCraftingVideoScript ? (
-                    <>
-                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                      Crafting...
-                    </>
-                  ) : (
-                    <>
-                      <Video className="mr-1 h-3 w-3" />
-                      Craft Great Video Script
-                    </>
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 px-2 text-xs"
-                  onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
-                  disabled={isCraftingLinkedInPost}
-                >
-                  {isCraftingLinkedInPost ? (
-                    <>
-                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                      Crafting...
-                    </>
-                  ) : (
-                    <>
-                      <Linkedin className="mr-1 h-3 w-3" />
-                      Craft Great LinkedIn Posts
-                    </>
-                  )}
+                  {isLoading ? <Square size={20} /> : <ArrowUp size={20} />}
                 </Button>
               </div>
-            )}
-            {renderInputWithSuperPrompt()}
+            </div>
           </div>
-          <p className="text-center text-xs leading-normal text-muted-foreground">
-            By continuing, you agree to our{" "}
-            <a
-              href="https://morphic.ai/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-4 hover:text-primary"
+
+          {messages.length === 0 && (
+            <EmptyScreen
+              submitMessage={message => {
+                handleInputChange({
+                  target: { value: message }
+                } as React.ChangeEvent<HTMLTextAreaElement>)
+              }}
+              className={cn(showEmptyScreen ? 'visible' : 'invisible')}
+            />
+          )}
+          <div className="flex gap-2 mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftTweets)}
             >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="https://morphic.ai/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-4 hover:text-primary"
+              <Twitter className="size-4" />
+              Craft Great Tweets
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
             >
-              Privacy Policy
-            </a>
-            .
-          </p>
-        </div>
-      </div>
+              <Video className="size-4" />
+              Craft Great Video Script
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
+            >
+              <Linkedin className="size-4" />
+              Craft Great LinkedIn Posts
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   )
 }
