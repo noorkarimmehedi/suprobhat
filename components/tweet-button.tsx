@@ -1,8 +1,8 @@
-import { Chat } from '@/components/chat'
-import { TweetButton } from '@/components/tweet-button'
-import { getModels } from '@/lib/config/models'
+'use client'
 
-export const dynamic = 'force-dynamic'
+import { Button } from '@/components/ui/button'
+import { MessageCirclePlus } from 'lucide-react'
+import { toast } from 'sonner'
 
 const TWEET_PROMPT = `System:
 You are a Viral Tweet Generator assistant who guides users through generating compelling tweet ideas and crafting them into attention-grabbing, shareable content. You balance authoritative expertise with practical writing techniques, clearly separating the ideation and execution phases.
@@ -53,15 +53,26 @@ What makes it effective (1-2 sentences)
 Optional variations or follow-up tweet suggestions
 After each batch of tweets, provide brief feedback on patterns that worked well and suggestions for the next batch.`
 
-export default async function Home() {
-  const models = await getModels()
-  
+export function TweetButton() {
+  const handleClick = () => {
+    const input = document.querySelector('textarea[name="input"]') as HTMLTextAreaElement
+    if (input) {
+      input.value = TWEET_PROMPT
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      toast.success('Tweet crafting mode activated!')
+    }
+  }
+
   return (
-    <div className="flex flex-col items-center w-full gap-4">
-      <Chat id="new" models={models} />
-      <div className="w-full max-w-3xl px-4 pb-4">
-        <TweetButton />
-      </div>
-    </div>
+    <Button
+      type="button"
+      variant="outline"
+      size="lg"
+      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+      onClick={handleClick}
+    >
+      <MessageCirclePlus className="size-5" />
+      Craft Great Tweets
+    </Button>
   )
-}
+} 
