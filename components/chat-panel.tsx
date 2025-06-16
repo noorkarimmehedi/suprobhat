@@ -35,7 +35,6 @@ interface ChatPanelProps {
   scrollContainerRef: React.RefObject<HTMLDivElement>
   showSignInPopup: boolean
   setShowSignInPopup: (show: boolean) => void
-  setInput: (input: string | ((prev: string) => string)) => void
 }
 
 const SUPER_PROMPT = `You are a Prompt Generator, specializing in creating well-structured, verifiable, and low-hallucination prompts for any desired use case. Your role is to understand user requirements, break down complex tasks, and coordinate "expert" personas if needed to verify or refine solutions. You can ask clarifying questions when critical details are missing. Otherwise, minimize friction.
@@ -333,8 +332,7 @@ export function ChatPanel({
   showScrollToBottomButton,
   scrollContainerRef,
   showSignInPopup,
-  setShowSignInPopup,
-  setInput
+  setShowSignInPopup
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -515,77 +513,33 @@ export function ChatPanel({
     </div>
   )
 
-  const renderInputWithSuperPrompt = () => {
-    const inputElement = (
-      <div className="relative flex w-full items-center">
-        <Textarea
-          tabIndex={0}
-          rows={1}
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              if (!isAuthenticated) {
-                setShowSignInPopup(true)
-                return
-              }
-              handleSubmit(e as any)
-            }
-          }}
-          placeholder="Send a message..."
-          spellCheck={false}
-          className="min-h-[60px] w-full resize-none bg-transparent px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
-        />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-8"
-            onClick={() => {
-              if (!isAuthenticated) {
-                setShowSignInPopup(true)
-                return
-              }
-              setInput((prev: string) => prev + SUPER_PROMPT)
-            }}
-            title="Add super prompt"
-          >
-            <Sparkles className="size-4" />
-          </Button>
-          <Button
-            type="submit"
-            size="icon"
-            disabled={isLoading || input.trim().length === 0}
-            className="size-8"
-          >
-            {isLoading ? (
-              <Spinner className="size-4" />
-            ) : (
-              <ArrowUp className="size-4" />
-            )}
-          </Button>
-        </div>
-      </div>
-    )
-
-    if (!isAuthenticated) {
-      return (
-        <AuthPrompt 
-          trigger={inputElement}
-          open={showSignInPopup}
-          onOpenChange={setShowSignInPopup}
+  const renderInputWithSuperPrompt = () => (
+    <>
+      {renderInput()}
+      <div className="pl-2 pr-4 pb-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+          onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
+          disabled={isGeneratingPrompt || input.trim().length === 0}
         >
-          <div className="p-4 text-sm text-muted-foreground">
-            Sign in to start chatting
-          </div>
-        </AuthPrompt>
-      )
-    }
-
-    return inputElement
-  }
+          {isGeneratingPrompt ? (
+            <>
+              <Spinner className="size-4" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="size-4" />
+              Craft Super Prompt
+            </>
+          )}
+        </Button>
+      </div>
+    </>
+  )
 
   if (isAuthLoading) {
     return null // or a loading spinner if you prefer
@@ -607,18 +561,51 @@ export function ChatPanel({
             />
           </div>
           <form
-            onSubmit={e => {
-              e.preventDefault()
-              if (!isAuthenticated) {
-                setShowSignInPopup(true)
-                return
-              }
-              handleSubmit(e)
-            }}
+            onSubmit={handleSubmit}
             className={cn('w-full max-w-3xl mx-auto relative')}
           >
             <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
-              {renderInputWithSuperPrompt()}
+              {isAuthenticated ? (
+                renderInputWithSuperPrompt()
+              ) : (
+                <AuthPrompt trigger={renderInputWithSuperPrompt()}>
+                  <div className="p-4 text-sm text-muted-foreground">
+                    Sign in to start chatting
+                  </div>
+                </AuthPrompt>
+              )}
+              <div className="flex items-center justify-between p-3">
+                {isAuthenticated ? (
+                  renderModelSelector()
+                ) : (
+                  <AuthPrompt trigger={renderModelSelector()}>
+                    <div className="text-sm text-muted-foreground">
+                      Sign in to select a model
+                    </div>
+                  </AuthPrompt>
+                )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={!isAuthenticated || isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
+                    className="shrink-0 rounded-full"
+                  >
+                    <ArrowUp className="size-4" />
+                  </Button>
+                  {isLoading && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={stop}
+                      className="shrink-0 rounded-full"
+                    >
+                      <Square className="size-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </form>
           <div className="flex gap-2 mt-4">
@@ -656,14 +643,7 @@ export function ChatPanel({
         </div>
       ) : (
         <form
-          onSubmit={e => {
-            e.preventDefault()
-            if (!isAuthenticated) {
-              setShowSignInPopup(true)
-              return
-            }
-            handleSubmit(e)
-          }}
+          onSubmit={handleSubmit}
           className={cn('w-full max-w-3xl mx-auto relative')}
         >
           {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
@@ -681,7 +661,15 @@ export function ChatPanel({
           )}
 
           <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
-            {renderInputWithSuperPrompt()}
+            {isAuthenticated ? (
+              renderInputWithSuperPrompt()
+            ) : (
+              <AuthPrompt trigger={renderInputWithSuperPrompt()}>
+                <div className="p-4 text-sm text-muted-foreground">
+                  Sign in to continue chatting
+                </div>
+              </AuthPrompt>
+            )}
 
             {/* Bottom menu area */}
             <div className="flex items-center justify-between p-3">

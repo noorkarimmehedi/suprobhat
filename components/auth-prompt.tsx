@@ -15,29 +15,19 @@ import { useState } from 'react'
 interface AuthPromptProps {
   children: React.ReactNode
   trigger: React.ReactNode
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
 }
 
-export function AuthPrompt({ children, trigger, open, onOpenChange }: AuthPromptProps) {
-  const [internalOpen, setInternalOpen] = useState(false)
+export function AuthPrompt({ children, trigger }: AuthPromptProps) {
+  const [open, setOpen] = useState(false)
   const router = useRouter()
 
   const handleSignIn = () => {
-    if (onOpenChange) {
-      onOpenChange(false)
-    } else {
-      setInternalOpen(false)
-    }
+    setOpen(false)
     router.push('/auth/login')
   }
 
-  const isControlled = open !== undefined && onOpenChange !== undefined
-  const isOpen = isControlled ? open : internalOpen
-  const setIsOpen = isControlled ? onOpenChange : setInternalOpen
-
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -56,11 +46,7 @@ export function AuthPrompt({ children, trigger, open, onOpenChange }: AuthPrompt
               variant="link"
               className="p-0 h-auto font-normal"
               onClick={() => {
-                if (onOpenChange) {
-                  onOpenChange(false)
-                } else {
-                  setInternalOpen(false)
-                }
+                setOpen(false)
                 router.push('/auth/sign-up')
               }}
             >

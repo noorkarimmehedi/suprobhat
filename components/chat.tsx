@@ -45,8 +45,7 @@ export function Chat({
     data,
     setData,
     addToolResult,
-    reload,
-    setInput
+    reload
   } = useChat({
     initialMessages: savedMessages,
     id: CHAT_ID,
@@ -261,7 +260,6 @@ export function Chat({
         scrollContainerRef={scrollContainerRef}
         showSignInPopup={showSignInPopup}
         setShowSignInPopup={setShowSignInPopup}
-        setInput={setInput}
       />
     </div>
   )
