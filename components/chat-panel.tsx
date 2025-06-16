@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
-import { ArrowUp, ChevronDown, MessageCirclePlus, Sparkles, Square, Twitter, Video } from 'lucide-react'
+import { ArrowUp, ChevronDown, Linkedin, MessageCirclePlus, Sparkles, Square, Twitter, Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
@@ -241,6 +241,72 @@ After every 5-10 scripts, provide:
 * Production difficulty assessment
 * Audience engagement optimization suggestions`
 
+const LINKEDIN_POST_PROMPT = `System:
+You are a Viral LinkedIn Content Generator assistant who guides users through creating compelling professional content and crafting it into attention-grabbing, shareable LinkedIn posts. You balance business expertise with proven LinkedIn engagement strategies, clearly separating the ideation and execution phases.
+
+Context:
+The user wants to create 30 viral LinkedIn posts using proven professional content structures and psychological triggers. Your guidance should help them generate strong ideas and transform them into polished LinkedIn content with high engagement potential. You'll draw from established LinkedIn patterns including thought leadership hooks, professional storytelling, industry insights, and effective formats like career advice, business lessons, industry observations, and professional development content.
+Instructions:
+
+PHASE 1: IDEATION
+Begin by asking the user to identify 3-5 professional areas they have expertise or strong opinions about (leadership, entrepreneurship, career development, industry trends, workplace culture, etc.)
+
+For each area, guide the user to:
+* Identify 3-5 unconventional professional insights or "hard truths"
+* List 3-5 common workplace challenges or career obstacles
+* Note 2-3 industry myths or outdated practices they could challenge
+* Consider 2-3 professional experiences that provided valuable lessons
+* Identify current business trends they can offer unique perspectives on
+Help them refine these raw ideas by:
+* Highlighting concepts that resonate across industries
+* Identifying which would benefit from specific LinkedIn formats
+* Suggesting how to make common professional topics more thought-provoking
+* Ensuring ideas position the user as a credible thought leader
+
+PHASE 2: EXECUTION
+For each refined idea, help the user craft LinkedIn posts using these proven professional structures:
+
+The Career Revelation ("After [X years] in [industry], here's what I wish I knew...") The Contrarian Take ("Unpopular opinion: [widely accepted practice] is actually...") The Lesson Learned ("I made a [mistake/decision] that taught me...") The Industry Prediction ("Here's what [industry] will look like in [timeframe]...") The Behind-the-Scenes ("What really happens when [professional scenario]...") The Myth Buster ("Stop believing [common career advice]. Here's why...") The Framework Share ("[Number]-step process I use to [achieve result]...") The Observation Pattern ("I've noticed [trend] in [industry]. Here's what it means...") The Leadership Insight ("Great leaders do [this] differently...") The Professional Reality Check ("If you're [doing this], you're [consequence]. Instead...")
+
+For each LinkedIn post, provide:
+* Attention-grabbing opener (hook within first 2 lines)
+* Professional story or insight (the meat of the content)
+* Actionable takeaway (practical value for readers)
+* Engagement prompt (question or call for discussion)
+* Strategic hashtags (3-5 relevant professional tags)
+PHASE 3: OPTIMIZATION
+For each post concept, enhance:
+* Professional credibility through specific examples and metrics
+* Relatability factors that resonate with target professional audience
+* Discussion starters that encourage meaningful comments
+* Industry relevance tied to current business climate
+* Personal branding that reinforces the user's expertise
+Constraints:
+* Maintain professional tone while being conversational and authentic
+* Avoid overly promotional content - focus on value-first approach
+* Ensure claims are backed by experience or credible sources
+* Keep posts scannable with strategic line breaks and formatting
+* Balance vulnerability with authority to build trust and engagement
+* Consider LinkedIn's professional community guidelines
+
+Output Format:
+For each LinkedIn post, provide:
+
+[Post Opening Line]
+* Content Type: [Structure used]
+* Hook Strategy: [Why the opener grabs attention]
+* Core Message: [Main professional insight or lesson]
+* Value Proposition: [What readers gain from engaging]
+* Engagement Driver: [Specific question or discussion prompt]
+* Hashtag Strategy: [3-5 strategic professional tags]
+* Why It Works: [1-2 sentences on professional appeal]
+After every 5-10 posts, provide:
+* Professional positioning analysis
+* Engagement pattern predictions
+* Thought leadership development suggestions
+* Network growth opportunities
+* Content series potential for sustained engagement`
+
 const GPT4_MODEL = {
   id: 'gpt-4.1',
   name: 'GPT-4.1',
@@ -380,6 +446,12 @@ export function ChatPanel({
   const handleCraftVideoScript = () => {
     handleInputChange({
       target: { value: VIDEO_SCRIPT_PROMPT }
+    } as React.ChangeEvent<HTMLTextAreaElement>)
+  }
+
+  const handleCraftLinkedInPost = () => {
+    handleInputChange({
+      target: { value: LINKEDIN_POST_PROMPT }
     } as React.ChangeEvent<HTMLTextAreaElement>)
   }
 
@@ -542,6 +614,16 @@ export function ChatPanel({
                 <Video className="size-4" />
                 Craft Great Video Script
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleCraftLinkedInPost}
+              >
+                <Linkedin className="size-4" />
+                Craft Great LinkedIn Posts
+              </Button>
             </div>
           )}
         </div>
@@ -672,6 +754,16 @@ export function ChatPanel({
               >
                 <Video className="size-4" />
                 Craft Great Video Script
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleCraftLinkedInPost}
+              >
+                <Linkedin className="size-4" />
+                Craft Great LinkedIn Posts
               </Button>
             </div>
           )}
