@@ -67,12 +67,12 @@ export function TweetButton() {
     <Button
       type="button"
       variant="outline"
-      size="lg"
-      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+      size="default"
+      className="flex items-center gap-2 text-muted-foreground hover:text-foreground whitespace-nowrap"
       onClick={handleClick}
     >
-      <MessageCirclePlus className="size-5" />
-      Craft Great Tweets
+      <MessageCirclePlus className="size-4" />
+      <span>Craft Tweets</span>
     </Button>
   )
 } 

@@ -57,10 +57,15 @@ export default async function Home() {
   const models = await getModels()
   
   return (
-    <div className="flex flex-col items-center w-full gap-4">
-      <Chat id="new" models={models} />
-      <div className="w-full max-w-3xl px-4 pb-4">
-        <TweetButton />
+    <div className="flex flex-col items-center w-full">
+      <div className="w-full max-w-3xl mx-auto">
+        <Chat id="new" models={models} />
+      </div>
+      <div className="w-full max-w-3xl mx-auto px-4 pb-4 mt-4">
+        <div className="flex gap-2">
+          <TweetButton />
+          {/* Add more buttons here */}
+        </div>
       </div>
     </div>
   )
