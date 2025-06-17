@@ -10,7 +10,7 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface AuthPromptProps {
   children: React.ReactNode
@@ -19,17 +19,34 @@ interface AuthPromptProps {
 
 export function AuthPrompt({ children, trigger }: AuthPromptProps) {
   const [open, setOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleSignIn = () => {
     setOpen(false)
     router.push('/auth/login')
   }
 
+  // Mobile-specific animation classes
+  const mobileAnimationClasses = isMobile 
+    ? "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-lg duration-300 ease-out"
+    : "sm:max-w-md"
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className={mobileAnimationClasses}>
         <DialogHeader>
           <DialogTitle>Sign In Required</DialogTitle>
           <DialogDescription>
