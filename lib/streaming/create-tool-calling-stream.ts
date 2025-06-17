@@ -1,10 +1,10 @@
 import { researcher } from '@/lib/agents/researcher'
 import {
-  convertToCoreMessages,
-  CoreMessage,
-  createDataStreamResponse,
-  DataStreamWriter,
-  streamText
+    convertToCoreMessages,
+    CoreMessage,
+    createDataStreamResponse,
+    DataStreamWriter,
+    streamText
 } from 'ai'
 import { getMaxAllowedTokens, truncateMessages } from '../utils/context-window'
 import { isReasoningModel } from '../utils/registry'
@@ -75,8 +75,24 @@ export function createToolCallingStreamResponse(config: BaseStreamConfig) {
       }
     },
     onError: error => {
-      // console.error('Stream error:', error)
-      return error instanceof Error ? error.message : String(error)
+      console.error('Stream error:', error)
+      
+      // Provide more specific error messages
+      let errorMessage = 'An error occurred while processing your request.'
+      
+      const errorString = error instanceof Error ? error.message : String(error)
+      
+      if (errorString.includes('timeout') || errorString.includes('aborted')) {
+        errorMessage = 'The request timed out. Please try again with a shorter question.'
+      } else if (errorString.includes('rate limit') || errorString.includes('quota')) {
+        errorMessage = 'Rate limit exceeded. Please wait a moment and try again.'
+      } else if (errorString.includes('authentication') || errorString.includes('unauthorized')) {
+        errorMessage = 'Authentication error. Please check your API keys.'
+      } else if (errorString.includes('network') || errorString.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection.'
+      }
+      
+      return errorMessage
     }
   })
 }

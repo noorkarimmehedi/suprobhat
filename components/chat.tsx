@@ -69,7 +69,22 @@ export function Chat({
       window.dispatchEvent(new CustomEvent('chat-history-updated'))
     },
     onError: error => {
-      toast.error(`Error in chat: ${error.message}`)
+      console.error('Chat error:', error)
+      
+      // Provide more specific error messages based on error type
+      let errorMessage = 'An error occurred while processing your request.'
+      
+      if (error.message.includes('timeout') || error.message.includes('aborted')) {
+        errorMessage = 'The request timed out. Please try again with a shorter question or check your internet connection.'
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.'
+      } else if (error.message.includes('rate limit') || error.message.includes('quota')) {
+        errorMessage = 'Rate limit exceeded. Please wait a moment and try again.'
+      } else if (error.message.includes('authentication') || error.message.includes('unauthorized')) {
+        errorMessage = 'Authentication error. Please sign in again.'
+      }
+      
+      toast.error(errorMessage)
     },
     sendExtraMessageFields: false,
     experimental_throttle: 100

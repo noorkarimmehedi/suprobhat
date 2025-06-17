@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
-import { ArrowUp, ChevronDown, MessageCirclePlus, Sparkles, Square } from 'lucide-react'
+import { ArrowUp, ChevronDown, MessageCirclePlus, RefreshCw, Sparkles, Square } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Textarea from 'react-textarea-autosize'
@@ -433,6 +433,9 @@ export function ChatPanel({
   const [enterDisabled, setEnterDisabled] = useState(false) // Disable Enter after composition ends
   const { close: closeArtifact } = useArtifact()
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false)
+  const [lastUserMessage, setLastUserMessage] = useState<string>('')
+  const [canRetry, setCanRetry] = useState(false)
+  const [showTimeoutWarning, setShowTimeoutWarning] = useState(false)
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -448,6 +451,27 @@ export function ChatPanel({
     setMessages([])
     closeArtifact()
     router.push('/')
+  }
+
+  const handleRetry = () => {
+    if (lastUserMessage.trim()) {
+      // Remove the last incomplete assistant message if it exists
+      const updatedMessages = messages.filter((msg, index) => {
+        if (index === messages.length - 1 && msg.role === 'assistant') {
+          return false // Remove last assistant message
+        }
+        return true
+      })
+      setMessages(updatedMessages)
+      
+      // Retry with the last user message
+      append({
+        role: 'user',
+        content: lastUserMessage
+      })
+      setCanRetry(false)
+      setShowTimeoutWarning(false)
+    }
   }
 
   const isToolInvocationInProgress = () => {
@@ -476,6 +500,35 @@ export function ChatPanel({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
+
+  // Track last user message and enable retry
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1]
+      if (lastMessage.role === 'user') {
+        setLastUserMessage(lastMessage.content)
+        setCanRetry(false)
+      } else if (lastMessage.role === 'assistant' && !isLoading) {
+        // If we have an assistant message and we're not loading, enable retry
+        setCanRetry(true)
+      }
+    }
+  }, [messages, isLoading])
+
+  // Show timeout warning after 60 seconds of loading
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    if (isLoading) {
+      timeoutId = setTimeout(() => {
+        setShowTimeoutWarning(true)
+      }, 60000) // 60 seconds
+    } else {
+      setShowTimeoutWarning(false)
+    }
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [isLoading])
 
   // Scroll to the bottom of the container
   const handleScrollToBottom = () => {
@@ -771,6 +824,16 @@ export function ChatPanel({
               </AuthPrompt>
             )}
 
+            {/* Timeout warning */}
+            {showTimeoutWarning && isLoading && (
+              <div className="px-4 py-2 bg-yellow-50 border-t border-yellow-200 rounded-b-2xl sm:rounded-b-3xl">
+                <div className="flex items-center gap-2 text-sm text-yellow-800">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                  <span>This is taking longer than usual. You can wait or try stopping and retrying.</span>
+                </div>
+              </div>
+            )}
+
             {/* Bottom menu area */}
             <div className="flex items-center justify-between p-2 sm:p-3">
               {isAuthenticated ? (
@@ -793,6 +856,18 @@ export function ChatPanel({
                     disabled={isLoading || isToolInvocationInProgress()}
                   >
                     <MessageCirclePlus className="size-3 sm:size-4 group-hover:rotate-12 transition-all" />
+                  </Button>
+                )}
+                {canRetry && !isLoading && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleRetry}
+                    className="shrink-0 rounded-full h-8 w-8 sm:h-10 sm:w-10"
+                    type="button"
+                    title="Retry last message"
+                  >
+                    <RefreshCw className="size-3 sm:size-4" />
                   </Button>
                 )}
                 <Button
