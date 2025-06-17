@@ -39,8 +39,8 @@ export const TextHoverEffect = ({
     }
   }, [cursor]);
 
-  const textSize = isMobile ? "8rem" : "13rem";
-  const viewBox = isMobile ? "0 0 400 150" : "0 0 768 250";
+  const textSize = isMobile ? "6rem" : "13rem";
+  const viewBox = isMobile ? "0 0 300 120" : "0 0 768 250";
 
   return (
     <svg
@@ -94,6 +94,8 @@ export const TextHoverEffect = ({
           />
         </mask>
       </defs>
+      
+      {/* Background text (stroke only) */}
       <text
         x="50%"
         y="50%"
@@ -108,6 +110,8 @@ export const TextHoverEffect = ({
       >
         {text}
       </text>
+      
+      {/* Animated stroke text */}
       <motion.text
         x="50%"
         y="50%"
@@ -128,6 +132,8 @@ export const TextHoverEffect = ({
       >
         {text}
       </motion.text>
+      
+      {/* Gradient text with mask */}
       <text
         x="50%"
         y="50%"

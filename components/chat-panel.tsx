@@ -614,7 +614,7 @@ export function ChatPanel({
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftTweets)}
-              className="text-xs sm:text-sm"
+              className="text-xs sm:text-sm w-full sm:w-auto"
             >
               Craft Great Tweets
             </ShineButton>
@@ -622,7 +622,7 @@ export function ChatPanel({
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=5NvZIXB49iQB&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
-              className="text-xs sm:text-sm"
+              className="text-xs sm:text-sm w-full sm:w-auto"
             >
               Craft Great Video Script
             </ShineButton>
@@ -630,7 +630,7 @@ export function ChatPanel({
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=8808&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
-              className="text-xs sm:text-sm"
+              className="text-xs sm:text-sm w-full sm:w-auto"
             >
               Craft Great LinkedIn Posts
             </ShineButton>
