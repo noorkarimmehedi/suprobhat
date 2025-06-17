@@ -609,31 +609,33 @@ export function ChatPanel({
               </div>
             </div>
           </form>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4 px-2 sm:px-0">
-            <ShineButton
-              type="button"
-              iconUrl="https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000"
-              onClick={() => handleCraftButtonClick(handleCraftTweets)}
-              className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
-            >
-              Craft Great Tweets
-            </ShineButton>
-            <ShineButton
-              type="button"
-              iconUrl="https://img.icons8.com/?size=100&id=5NvZIXB49iQB&format=png&color=000000"
-              onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
-              className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
-            >
-              Craft Great Video Script
-            </ShineButton>
-            <ShineButton
-              type="button"
-              iconUrl="https://img.icons8.com/?size=100&id=8808&format=png&color=000000"
-              onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
-              className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
-            >
-              Craft Great LinkedIn Posts
-            </ShineButton>
+          <div className="w-full max-w-3xl mx-auto relative px-2 sm:px-0">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4 w-full">
+              <ShineButton
+                type="button"
+                iconUrl="https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000"
+                onClick={() => handleCraftButtonClick(handleCraftTweets)}
+                className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
+              >
+                Craft Great Tweets
+              </ShineButton>
+              <ShineButton
+                type="button"
+                iconUrl="https://img.icons8.com/?size=100&id=5NvZIXB49iQB&format=png&color=000000"
+                onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
+                className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
+              >
+                Craft Great Video Script
+              </ShineButton>
+              <ShineButton
+                type="button"
+                iconUrl="https://img.icons8.com/?size=100&id=8808&format=png&color=000000"
+                onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
+                className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
+              >
+                Craft Great LinkedIn Posts
+              </ShineButton>
+            </div>
           </div>
         </div>
       ) : (
