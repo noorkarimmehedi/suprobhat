@@ -517,7 +517,7 @@ export function ChatPanel({
   const renderInputWithSuperPrompt = () => (
     <>
       {renderInput()}
-      <div className="pl-2 pr-3 sm:pr-4 pb-2">
+      <div className="pl-1 pr-3 sm:pr-4 pb-2">
         <Button
           type="button"
           variant="ghost"
