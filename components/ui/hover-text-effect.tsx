@@ -42,6 +42,36 @@ export const TextHoverEffect = ({
   const textSize = isMobile ? "6rem" : "13rem";
   const viewBox = isMobile ? "0 0 300 120" : "0 0 768 250";
 
+  // On mobile, show simplified version without animation
+  if (isMobile) {
+    return (
+      <svg
+        ref={svgRef}
+        width="100%"
+        height="100%"
+        viewBox={viewBox}
+        xmlns="http://www.w3.org/2000/svg"
+        className="select-none"
+      >
+        <text
+          x="50%"
+          y="50%"
+          textAnchor="middle"
+          dominantBaseline="middle"
+          strokeWidth="1.5"
+          className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
+          style={{ 
+            opacity: 0.9,
+            fontSize: textSize
+          }}
+        >
+          {text}
+        </text>
+      </svg>
+    );
+  }
+
+  // Desktop version with full animation
   return (
     <svg
       ref={svgRef}

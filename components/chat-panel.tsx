@@ -609,12 +609,12 @@ export function ChatPanel({
               </div>
             </div>
           </form>
-          <div className="flex flex-col sm:flex-row gap-2 mt-4 px-2 sm:px-0">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4 px-2 sm:px-0">
             <ShineButton
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftTweets)}
-              className="text-xs sm:text-sm w-full sm:w-auto"
+              className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
             >
               Craft Great Tweets
             </ShineButton>
@@ -622,7 +622,7 @@ export function ChatPanel({
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=5NvZIXB49iQB&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
-              className="text-xs sm:text-sm w-full sm:w-auto"
+              className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
             >
               Craft Great Video Script
             </ShineButton>
@@ -630,7 +630,7 @@ export function ChatPanel({
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=8808&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
-              className="text-xs sm:text-sm w-full sm:w-auto"
+              className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
             >
               Craft Great LinkedIn Posts
             </ShineButton>
