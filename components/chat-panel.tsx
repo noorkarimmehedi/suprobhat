@@ -652,7 +652,7 @@ export function ChatPanel({
         <div className="flex flex-col items-center justify-center w-full mx-auto gap-2">
           <div className="w-full h-[200px] sm:h-[250px] flex items-center justify-center">
             <TextHoverEffect
-              text="Arc Lab"
+              text="সুপ্রভাত"
               duration={0.5}
             />
           </div>
