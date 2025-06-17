@@ -609,7 +609,7 @@ export function ChatPanel({
               </div>
             </div>
           </form>
-          <div className="w-full max-w-3xl mx-auto relative px-2 sm:px-0">
+          <div className="w-full max-w-3xl mx-auto relative px-2 sm:px-0 sm:max-w-none sm:mx-0 sm:relative sm:px-0">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4 w-full">
               <ShineButton
                 type="button"
