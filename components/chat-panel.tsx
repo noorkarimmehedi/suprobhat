@@ -515,13 +515,13 @@ export function ChatPanel({
     }
   }, [messages, isLoading])
 
-  // Show timeout warning after 60 seconds of loading
+  // Show timeout warning after 45 seconds of loading
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
     if (isLoading) {
       timeoutId = setTimeout(() => {
         setShowTimeoutWarning(true)
-      }, 60000) // 60 seconds
+      }, 45000) // 45 seconds
     } else {
       setShowTimeoutWarning(false)
     }
