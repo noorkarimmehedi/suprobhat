@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
     <header
       className={cn(
         'sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
-        'px-4 py-2'
+        'px-3 sm:px-4 py-2'
       )}
     >
       <div className="flex items-center justify-between">
@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {user && <ChatHistoryPopover />}
           {user ? <UserMenu user={user} /> : <GuestMenu />}
         </div>

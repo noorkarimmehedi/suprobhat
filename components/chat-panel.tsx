@@ -481,7 +481,7 @@ export function ChatPanel({
       spellCheck={false}
       value={input}
       disabled={isLoading || isToolInvocationInProgress()}
-      className="resize-none w-full h-[52px] min-h-[52px] bg-transparent border-0 p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      className="resize-none w-full h-[48px] sm:h-[52px] min-h-[48px] sm:min-h-[52px] bg-transparent border-0 p-3 sm:p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       onChange={e => {
         handleInputChange(e)
         setShowEmptyScreen(e.target.value.length === 0)
@@ -508,7 +508,7 @@ export function ChatPanel({
   )
 
   const renderModelSelector = () => (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <ModelSelector models={models || []} />
       <SearchModeToggle />
     </div>
@@ -517,23 +517,23 @@ export function ChatPanel({
   const renderInputWithSuperPrompt = () => (
     <>
       {renderInput()}
-      <div className="pl-2 pr-4 pb-2">
+      <div className="pl-2 pr-3 sm:pr-4 pb-2">
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground text-xs sm:text-sm"
           onClick={() => handleCraftButtonClick(handleCraftSuperPrompt)}
           disabled={isGeneratingPrompt || input.trim().length === 0}
         >
           {isGeneratingPrompt ? (
             <>
-              <Spinner className="size-4" />
+              <Spinner className="size-3 sm:size-4" />
               Generating...
             </>
           ) : (
             <>
-              <Sparkles className="size-4" />
+              <Sparkles className="size-3 sm:size-4" />
               Craft Super Prompt
             </>
           )}
@@ -550,12 +550,12 @@ export function ChatPanel({
     <div
       className={cn(
         'w-full bg-background group/form-container shrink-0',
-        messages.length > 0 ? 'sticky bottom-0 px-2 pb-4' : 'px-6'
+        messages.length > 0 ? 'sticky bottom-0 px-2 pb-4' : 'px-4 sm:px-6'
       )}
     >
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center w-full mx-auto gap-2">
-          <div className="w-full h-[250px] flex items-center justify-center">
+          <div className="w-full h-[200px] sm:h-[250px] flex items-center justify-center">
             <TextHoverEffect
               text="সুপ্রভাত"
               duration={0.5}
@@ -563,9 +563,9 @@ export function ChatPanel({
           </div>
           <form
             onSubmit={handleSubmit}
-            className={cn('w-full max-w-3xl mx-auto relative')}
+            className={cn('w-full max-w-3xl mx-auto relative px-2 sm:px-0')}
           >
-            <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
+            <div className="relative flex flex-col w-full gap-2 bg-muted rounded-2xl sm:rounded-3xl border border-input">
               {isAuthenticated ? (
                 renderInputWithSuperPrompt()
               ) : (
@@ -575,7 +575,7 @@ export function ChatPanel({
                   </div>
                 </AuthPrompt>
               )}
-              <div className="flex items-center justify-between p-3">
+              <div className="flex items-center justify-between p-2 sm:p-3">
                 {isAuthenticated ? (
                   renderModelSelector()
                 ) : (
@@ -590,9 +590,9 @@ export function ChatPanel({
                     type="submit"
                     size="icon"
                     disabled={!isAuthenticated || isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
-                    className="shrink-0 rounded-full"
+                    className="shrink-0 rounded-full h-8 w-8 sm:h-10 sm:w-10"
                   >
-                    <ArrowUp className="size-4" />
+                    <ArrowUp className="size-3 sm:size-4" />
                   </Button>
                   {isLoading && (
                     <Button
@@ -600,20 +600,21 @@ export function ChatPanel({
                       variant="outline"
                       size="icon"
                       onClick={stop}
-                      className="shrink-0 rounded-full"
+                      className="shrink-0 rounded-full h-8 w-8 sm:h-10 sm:w-10"
                     >
-                      <Square className="size-4" />
+                      <Square className="size-3 sm:size-4" />
                     </Button>
                   )}
                 </div>
               </div>
             </div>
           </form>
-          <div className="flex gap-2 mt-4">
+          <div className="flex flex-col sm:flex-row gap-2 mt-4 px-2 sm:px-0">
             <ShineButton
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftTweets)}
+              className="text-xs sm:text-sm"
             >
               Craft Great Tweets
             </ShineButton>
@@ -621,6 +622,7 @@ export function ChatPanel({
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=5NvZIXB49iQB&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
+              className="text-xs sm:text-sm"
             >
               Craft Great Video Script
             </ShineButton>
@@ -628,6 +630,7 @@ export function ChatPanel({
               type="button"
               iconUrl="https://img.icons8.com/?size=100&id=8808&format=png&color=000000"
               onClick={() => handleCraftButtonClick(handleCraftLinkedInPost)}
+              className="text-xs sm:text-sm"
             >
               Craft Great LinkedIn Posts
             </ShineButton>
@@ -636,7 +639,7 @@ export function ChatPanel({
       ) : (
         <form
           onSubmit={handleSubmit}
-          className={cn('w-full max-w-3xl mx-auto relative')}
+          className={cn('w-full max-w-3xl mx-auto relative px-2 sm:px-0')}
         >
           {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
           {showScrollToBottomButton && messages.length > 0 && (
@@ -644,15 +647,15 @@ export function ChatPanel({
               type="button"
               variant="outline"
               size="icon"
-              className="absolute -top-10 right-4 z-20 size-8 rounded-full shadow-md"
+              className="absolute -top-10 right-4 z-20 size-6 sm:size-8 rounded-full shadow-md"
               onClick={handleScrollToBottom}
               title="Scroll to bottom"
             >
-              <ChevronDown size={16} />
+              <ChevronDown size={14} className="sm:size-16" />
             </Button>
           )}
 
-          <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
+          <div className="relative flex flex-col w-full gap-2 bg-muted rounded-2xl sm:rounded-3xl border border-input">
             {isAuthenticated ? (
               renderInputWithSuperPrompt()
             ) : (
@@ -664,7 +667,7 @@ export function ChatPanel({
             )}
 
             {/* Bottom menu area */}
-            <div className="flex items-center justify-between p-3">
+            <div className="flex items-center justify-between p-2 sm:p-3">
               {isAuthenticated ? (
                 renderModelSelector()
               ) : (
@@ -680,18 +683,18 @@ export function ChatPanel({
                     variant="outline"
                     size="icon"
                     onClick={handleNewChat}
-                    className="shrink-0 rounded-full group"
+                    className="shrink-0 rounded-full group h-8 w-8 sm:h-10 sm:w-10"
                     type="button"
                     disabled={isLoading || isToolInvocationInProgress()}
                   >
-                    <MessageCirclePlus className="size-4 group-hover:rotate-12 transition-all" />
+                    <MessageCirclePlus className="size-3 sm:size-4 group-hover:rotate-12 transition-all" />
                   </Button>
                 )}
                 <Button
                   type={isLoading ? 'button' : 'submit'}
                   size={'icon'}
                   variant={'outline'}
-                  className={cn(isLoading && 'animate-pulse', 'rounded-full')}
+                  className={cn(isLoading && 'animate-pulse', 'rounded-full h-8 w-8 sm:h-10 sm:w-10')}
                   disabled={
                     !isAuthenticated ||
                     (input.length === 0 && !isLoading) ||
@@ -699,7 +702,7 @@ export function ChatPanel({
                   }
                   onClick={isLoading ? stop : undefined}
                 >
-                  {isLoading ? <Square size={20} /> : <ArrowUp size={20} />}
+                  {isLoading ? <Square size={16} className="sm:size-20" /> : <ArrowUp size={16} className="sm:size-20" />}
                 </Button>
               </div>
             </div>

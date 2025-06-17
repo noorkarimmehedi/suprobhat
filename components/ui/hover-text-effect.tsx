@@ -14,6 +14,18 @@ export const TextHoverEffect = ({
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
   const [maskPosition, setMaskPosition] = useState({ cx: "50%", cy: "50%" });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (svgRef.current && cursor.x !== null && cursor.y !== null) {
@@ -27,12 +39,15 @@ export const TextHoverEffect = ({
     }
   }, [cursor]);
 
+  const textSize = isMobile ? "8rem" : "13rem";
+  const viewBox = isMobile ? "0 0 400 150" : "0 0 768 250";
+
   return (
     <svg
       ref={svgRef}
       width="100%"
       height="100%"
-      viewBox="0 0 768 250"
+      viewBox={viewBox}
       xmlns="http://www.w3.org/2000/svg"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -85,8 +100,11 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         strokeWidth="1.5"
-        className="fill-transparent stroke-neutral-200 font-[helvetica] text-[13rem] font-bold dark:stroke-neutral-800"
-        style={{ opacity: hovered ? 1 : 0.9 }}
+        className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
+        style={{ 
+          opacity: hovered ? 1 : 0.9,
+          fontSize: textSize
+        }}
       >
         {text}
       </text>
@@ -96,7 +114,8 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         strokeWidth="1.5"
-        className="fill-transparent stroke-neutral-200 font-[helvetica] text-[13rem] font-bold dark:stroke-neutral-800"
+        className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
+        style={{ fontSize: textSize }}
         initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
         animate={{
           strokeDashoffset: 0,
@@ -117,7 +136,8 @@ export const TextHoverEffect = ({
         stroke="url(#textGradient)"
         strokeWidth="1.5"
         mask="url(#textMask)"
-        className="fill-transparent font-[helvetica] text-[13rem] font-bold"
+        className="fill-transparent font-[helvetica] font-bold"
+        style={{ fontSize: textSize }}
       >
         {text}
       </text>
