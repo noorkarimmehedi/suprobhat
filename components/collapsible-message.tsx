@@ -3,9 +3,9 @@ import { cn } from '@/lib/utils'
 import { ChevronDown } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger
 } from './ui/collapsible'
 import { IconLogo } from './ui/icons'
 import { Separator } from './ui/separator'
@@ -34,19 +34,17 @@ export function CollapsibleMessage({
   const content = <div className="flex-1">{children}</div>
   const userImage = useCurrentUserImage()
 
+  // Determine alignment based on role
+  const isUserMessage = role === 'user'
+  const containerAlignment = isUserMessage ? 'justify-end' : 'justify-start'
+  const contentAlignment = isUserMessage ? 'items-end' : 'items-start'
+
   return (
-    <div className="flex">
-      {showIcon && (
+    <div className={cn('flex', containerAlignment)}>
+      {showIcon && !isUserMessage && (
         <div className="relative flex flex-col items-center">
           <div className="w-5">
-            {role === 'assistant' ? (
-              <IconLogo className="size-5" />
-            ) : (
-              <Avatar className="size-5">
-                <AvatarImage src={userImage || undefined} alt="User" />
-                <AvatarFallback className="text-[10px]">U</AvatarFallback>
-              </Avatar>
-            )}
+            <IconLogo className="size-5" />
           </div>
         </div>
       )}
@@ -55,7 +53,10 @@ export function CollapsibleMessage({
         <div
           className={cn(
             'flex-1 rounded-2xl p-4',
-            showBorder && 'border border-border/50'
+            showBorder && 'border border-border/50',
+            isUserMessage 
+              ? 'max-w-[85%] sm:max-w-[80%] md:max-w-[75%]' 
+              : 'max-w-[90%] sm:max-w-[85%] md:max-w-[80%]'
           )}
         >
           <Collapsible
@@ -85,10 +86,24 @@ export function CollapsibleMessage({
         <div
           className={cn(
             'flex-1 rounded-2xl',
-            role === 'assistant' ? 'px-0' : 'px-3'
+            role === 'assistant' ? 'px-0' : 'px-3',
+            isUserMessage 
+              ? 'max-w-[85%] sm:max-w-[80%] md:max-w-[75%]' 
+              : 'max-w-[90%] sm:max-w-[85%] md:max-w-[80%]'
           )}
         >
           {content}
+        </div>
+      )}
+
+      {showIcon && isUserMessage && (
+        <div className="relative flex flex-col items-center ml-2">
+          <div className="w-5">
+            <Avatar className="size-5">
+              <AvatarImage src={userImage || undefined} alt="User" />
+              <AvatarFallback className="text-[10px]">U</AvatarFallback>
+            </Avatar>
+          </div>
         </div>
       )}
     </div>

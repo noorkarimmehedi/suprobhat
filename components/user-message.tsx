@@ -46,7 +46,7 @@ export const UserMessage: React.FC<UserMessageProps> = ({
   return (
     <CollapsibleMessage role="user">
       <div
-        className="flex-1 break-words w-full group outline-none relative"
+        className="flex-1 break-words w-full group outline-none relative bg-primary/10 dark:bg-primary/20 rounded-2xl p-3 sm:p-4"
         tabIndex={0}
       >
         {isEditing ? (
@@ -70,7 +70,7 @@ export const UserMessage: React.FC<UserMessageProps> = ({
           </div>
         ) : (
           <div className="flex justify-between items-start">
-            <div className="flex-1">{message}</div>
+            <div className="flex-1 text-left text-sm sm:text-base">{message}</div>
             <div
               className={cn(
                 'absolute top-1 right-1 transition-opacity ml-2',
