@@ -802,7 +802,7 @@ export function ChatPanel({
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4 w-full sm:w-auto">
               <ShineButton
                 type="button"
-                iconUrl="https://img.icons8.com/?size=50&id=8277&format=png&color=000000"
+                iconUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAdBJREFUSEuVVgmSgzAMs/IyeBnwsuZl0WJykDjHtkyn06HG8iEpQKYXRIQSv+urvmP+7YOf53+8IAJaVBFNBXZ/GYBxvYHchHJQc4hsd7ZLu3Jw5xjsrTk+UoZgxgKREHhCeAihH8ETW+q6AJz9CN6cBqANJXnewziedCVvA6D3dzj4XKgtdwFw183wAsw35R2wz4iwXDIDmeb+pDe1Z8gXoOy/GdF8giQ/Epe6AhAHKK+GV+xgQm0FoMjWLrbbwQU3WnRMO6Rp5hIZNop8clA/oufO5YCzk2QqugCUJoyOlEn3+I+3fxVZ4obwgnNn0Z3ZwaCD3hI0KEQQXbJS1qdtX4DzKw1p3FBo33tH71fWC8qS6zaNsA0LIvzA1xYs+rdkCEPYEiWUth5I6h0an/Wi4oJtyySVRTp3NbvEuQVNp3ZdMwciDNQqlTlFZNaOjML9nUKNz9thlCVn8FT1gvt1irqb5/deQKwOih3U9jA0n1oH3fJ0N3u+2+lA3fM+ll5RTdxtzIkSrPo483HbWAUZPiJ45/4TQFQiId7B7VmAjVWoO6+WOfTUQRG4j7l0RLdml0bUTGBocDWFSnSMvN1XO/D5BeBLJc+k279JWPP4AzCH8CARbVX5AAAAAElFTkSuQmCC"
                 onClick={() => handleCraftButtonClick(handleCraftPersonalBrand)}
                 className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
               >
