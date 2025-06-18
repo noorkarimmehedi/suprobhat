@@ -87,7 +87,7 @@ export function Chat({
       toast.error(errorMessage)
     },
     sendExtraMessageFields: false,
-    experimental_throttle: 100
+    experimental_throttle: 50
   })
 
   // Listen for new chat creation and reset state
@@ -237,7 +237,6 @@ export function Chat({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setData(undefined)
     handleSubmit(e)
   }
 
