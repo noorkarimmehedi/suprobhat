@@ -810,7 +810,7 @@ export function ChatPanel({
               </ShineButton>
               <ShineButton
                 type="button"
-                iconUrl="https://img.icons8.com/?size=100&id=5NvZIXB49iQB&format=png&color=000000"
+                iconUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAd1JREFUSEuNVgmSwyAMk/hYk5elfVmzH8MbcxhDIFOm09IMWLJ8hSiLAAT5Oy+/v/+t98aTdqts9MeZezBKgDKS8DDzfQb4hawB/O5NMe3FIUTiG8Cr8lHBzM1G8i9dJt+NXG+n+mp3RUQNH52jZl21oX7AFCMHKdhD4FkjN8bPTkaRL4FtqerCFQBnIPcEMEhdHyWbcrkwkyXbzR7MtNI7gWSUuF1poAooyU+Sr/oqIvrwm5F6W474WS7XYx7vBNRGk46KKuVJA7jrUDz4kCExEhElspayabwH8kyQnQd2oAPbWQ5H9VbwnSrmrwh2hgSQUrNJNI2ynGTYC5k3BMdDSEo34MKDdbao/ZvWJWyz+JvXC4myK74U7lYes2sN8OzEQ//pLzqJomxCaKE5ykPKerK276Paqj2RqB7kIAsKwIrgYCvLdWsbrR5bFgESZQO10Kxu7f4qW4Y2pemo6Wu1Rl32l0CMorYeo+rh/T63CtH0VYDj6gVWmNNmdzc0ZFQvzkky1UhbrevZwNG+EdMs4DGVe6hwd8Ya27qbunFYBo5yfHVZMRTE1cc+2mtmrGvfLjGYT6J+gGQz40CfDoBBqNzk8zQf1sN7xmSw9Awam8m4rTgr4FWhzF95/gGGZQMwakT2vwAAAABJRU5ErkJggg=="
                 onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
                 className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
               >
@@ -818,7 +818,7 @@ export function ChatPanel({
               </ShineButton>
               <ShineButton
                 type="button"
-                iconUrl="https://img.icons8.com/?size=100&id=99031&format=png&color=000000"
+                iconUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAgZJREFUSEudVlu2wyAIhGysycrSrqzpxuRmRBFR23NuPvowgeExDGGKFxORlEMmYun+2q3BrpmQkBrCFu76ywPYnYA6hRkNcRIA5o5EZL/zOpEYE+H3S4iujber5efjbH4UIJTCP5pEnkx0dmkWJAAx81PvqdP4ucxAJO13IeEYEeer+XVwQhcxgObZjAAsJEmeRHKSILXoeoTREwEIsu3ysBJp35hE0ttHPbJlCQD7a2M+Kglr4awHSeSH8wk5DQ98vvNgNJ+P2lfLQBKYAoCRuSvOr3sjB2/bVeZAq5ZEdo4AGtQ/IOlg5qsS1KYu3d3t3C1o055ZRhAASt+TUhN9CKScIlnlJm0/QNvlJIuApnQ24lsDA2v9uVxE/Ml2RAdv3PcgNtJAXDZf8sgTnYnC9CaSnEHrgRevoFkmFZ6O1vYcNZzjGzOEqUeJfQ+CSBV9xsO1jgC5DR9uABHdJ0ctsgN7K6xB5pjoKoKFhG72mCilTuCyBFQByHR2zpzK5qiXYucrU+S5sMmU7oUpLdK0C9MjS3crXQmkV9ZBi7CGUsLQ5VoW+44tVRJaJ7REvQSUiO3Qp5YdL3WpaGfdVor92mwv9Hyc9sApq84DDlTIwJW4CLPzIsbDggsZhGkomy6zSP3qZrMlo3rz7bIMrMl+ff58AVDX3x4bS2ThTM2m7nxw8YXjD0DXHDKVSh9xAAAAAElFTkSuQmCC"
                 onClick={() => handleCraftButtonClick(handleCraftLearnComplexTopic)}
                 className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
               >
