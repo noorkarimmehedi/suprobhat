@@ -79,24 +79,26 @@ export function ChatMessages({
     }
   }, [data])
 
-  if (!sections.length) return null
-
   // Get all messages as a flattened array
-  const allMessages = sections.flatMap(section => [
-    section.userMessage,
-    ...section.assistantMessages
-  ])
+  const allMessages = useMemo(() => {
+    return sections.flatMap(section => [
+      section.userMessage,
+      ...section.assistantMessages
+    ])
+  }, [sections])
 
-  const lastUserIndex =
-    allMessages.length -
-    1 -
-    [...allMessages].reverse().findIndex(msg => msg.role === 'user')
+  const lastUserIndex = useMemo(() => {
+    return allMessages.length -
+      1 -
+      [...allMessages].reverse().findIndex(msg => msg.role === 'user')
+  }, [allMessages])
 
   // Check if loading indicator should be shown
-  const showLoading =
-    isLoading &&
-    sections.length > 0 &&
-    sections[sections.length - 1].assistantMessages.length === 0
+  const showLoading = useMemo(() => {
+    return isLoading &&
+      sections.length > 0 &&
+      sections[sections.length - 1].assistantMessages.length === 0
+  }, [isLoading, sections])
 
   // More stable loading state that doesn't flicker
   const shouldShowLoading = useMemo(() => {
@@ -122,6 +124,8 @@ export function ChatMessages({
       [id]: open
     }))
   }
+
+  if (!sections.length) return null
 
   return (
     <div
