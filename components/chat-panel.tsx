@@ -802,7 +802,7 @@ export function ChatPanel({
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4 w-full sm:w-auto">
               <ShineButton
                 type="button"
-                iconUrl="https://img.icons8.com/?size=70&id=8277&format=png&color=000000"
+                iconUrl="https://img.icons8.com/?size=50&id=8277&format=png&color=000000"
                 onClick={() => handleCraftButtonClick(handleCraftPersonalBrand)}
                 className="text-sm sm:text-sm w-full sm:w-auto h-12 sm:h-9"
               >
