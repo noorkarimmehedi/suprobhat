@@ -1,6 +1,7 @@
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'
+import { useCurrentUserName } from '@/hooks/use-current-user-name'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
@@ -483,6 +484,7 @@ export function ChatPanel({
   const [lastUserMessage, setLastUserMessage] = useState<string>('')
   const [canRetry, setCanRetry] = useState(false)
   const [showTimeoutWarning, setShowTimeoutWarning] = useState(false)
+  const currentUserName = useCurrentUserName()
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -666,7 +668,7 @@ export function ChatPanel({
       tabIndex={0}
       onCompositionStart={handleCompositionStart}
       onCompositionEnd={handleCompositionEnd}
-      placeholder="Ask a question..."
+      placeholder={`${currentUserName || 'User'}, Ask me a question...`}
       spellCheck={false}
       value={input}
       disabled={isLoading || isToolInvocationInProgress()}
