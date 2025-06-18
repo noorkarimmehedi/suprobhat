@@ -1,8 +1,6 @@
-// Trigger Vercel deployment: trivial change
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'
-import { useCurrentUserName } from '@/hooks/use-current-user-name'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
@@ -485,7 +483,6 @@ export function ChatPanel({
   const [lastUserMessage, setLastUserMessage] = useState<string>('')
   const [canRetry, setCanRetry] = useState(false)
   const [showTimeoutWarning, setShowTimeoutWarning] = useState(false)
-  const currentUserName = useCurrentUserName()
 
   const handleCompositionStart = () => setIsComposing(true)
 
@@ -669,11 +666,11 @@ export function ChatPanel({
       tabIndex={0}
       onCompositionStart={handleCompositionStart}
       onCompositionEnd={handleCompositionEnd}
-      placeholder={`${currentUserName || 'User'}, Ask me a question...`}
+      placeholder="Ask a question..."
       spellCheck={false}
       value={input}
       disabled={isLoading || isToolInvocationInProgress()}
-      className="resize-none w-full h-[48px] sm:h-[52px] min-h-[48px] sm:min-h-[52px] bg-transparent border-0 p-3 sm:p-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      className="resize-none w-full h-[48px] sm:h-[52px] min-h-[48px] sm:min-h-[52px] bg-transparent border-0 pl-4 pr-3 pt-3 pb-3 sm:pl-5 sm:pr-4 sm:pt-4 sm:pb-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       onChange={e => {
         handleInputChange(e)
         setShowEmptyScreen(e.target.value.length === 0)
