@@ -835,8 +835,8 @@ export function ChatPanel({
           onSubmit={handleSubmit}
           className={cn('w-full max-w-3xl mx-auto relative px-2 sm:px-0')}
         >
-          {// Scroll to bottom button - only shown when showScrollToBottomButton is true
-          showScrollToBottomButton && messages.length > 0 && (
+          {/* Scroll to bottom button - only shown when showScrollToBottomButton is true */}
+          {showScrollToBottomButton && messages.length > 0 && (
             <Button
               type="button"
               variant="outline"
@@ -860,8 +860,8 @@ export function ChatPanel({
               </AuthPrompt>
             )}
 
-            {// Timeout warning
-            showTimeoutWarning && isLoading && (
+            {/* Timeout warning */}
+            {showTimeoutWarning && isLoading && (
               <div className="px-4 py-2 bg-yellow-50 border-t border-yellow-200 rounded-b-2xl sm:rounded-b-3xl">
                 <div className="flex items-center gap-2 text-sm text-yellow-800">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
@@ -870,7 +870,7 @@ export function ChatPanel({
               </div>
             )}
 
-            {// Bottom menu area
+            {/* Bottom menu area */}
             <div className="flex items-center justify-between p-2 sm:p-3">
               {isAuthenticated ? (
                 renderModelSelector()
