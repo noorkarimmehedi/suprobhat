@@ -233,3 +233,4 @@ llm-1-azure.vercel.app
 Last updated: 2024-03-21
 
 ### Resources
+# Reverted to previous working state
