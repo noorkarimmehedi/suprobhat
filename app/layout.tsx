@@ -8,12 +8,12 @@ import { createClient } from '@/lib/supabase/server'
 import { cn } from '@/lib/utils'
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Inter as FontSans } from 'next/font/google'
+import { JetBrains_Mono as FontMono } from 'next/font/google'
 import './globals.css'
 
-const fontSans = FontSans({
+const fontMono = FontMono({
   subsets: ['latin'],
-  variable: '--font-sans'
+  variable: '--font-mono'
 })
 
 const title = 'Arc Lab'
@@ -65,8 +65,8 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          'min-h-screen flex flex-col font-sans antialiased',
-          fontSans.variable
+          'min-h-screen flex flex-col font-mono antialiased',
+          fontMono.variable
         )}
       >
         <ThemeProvider

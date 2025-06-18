@@ -149,7 +149,7 @@ const config = {
   		},
   		fontFamily: {
   			sans: [
-  				'var(--font-sans)',
+  				'var(--font-mono)',
                     ...fontFamily.sans
                 ]
   		}
