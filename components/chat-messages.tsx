@@ -98,6 +98,15 @@ export function ChatMessages({
     sections.length > 0 &&
     sections[sections.length - 1].assistantMessages.length === 0
 
+  // More stable loading state that doesn't flicker
+  const shouldShowLoading = useMemo(() => {
+    if (!isLoading) return false
+    if (sections.length === 0) return false
+    
+    const lastSection = sections[sections.length - 1]
+    return lastSection.assistantMessages.length === 0
+  }, [isLoading, sections])
+
   const getIsOpen = (id: string) => {
     if (id.includes('call')) {
       return openStates[id] ?? true
@@ -150,7 +159,7 @@ export function ChatMessages({
                 onUpdateMessage={onUpdateMessage}
                 reload={reload}
               />
-              {showLoading && <Spinner />}
+              {shouldShowLoading && <Spinner />}
             </div>
 
             {/* Assistant messages */}
@@ -172,7 +181,7 @@ export function ChatMessages({
           </div>
         ))}
 
-        {showLoading && lastToolData && (
+        {shouldShowLoading && lastToolData && (
           <ToolSection
             key={manualToolCallId}
             tool={lastToolData}

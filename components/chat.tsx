@@ -32,6 +32,7 @@ export function Chat({
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [showSignInPopup, setShowSignInPopup] = useState(false)
+  const [debouncedLoading, setDebouncedLoading] = useState(false)
 
   const {
     messages,
@@ -87,7 +88,7 @@ export function Chat({
       toast.error(errorMessage)
     },
     sendExtraMessageFields: false,
-    experimental_throttle: 50
+    experimental_throttle: 25
   })
 
   // Listen for new chat creation and reset state
@@ -106,7 +107,28 @@ export function Chat({
 
   const isLoading = status === 'submitted' || status === 'streaming'
 
-  // Convert messages array to sections array
+  // Debounce loading state to prevent flickering for large prompts
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    
+    if (isLoading) {
+      // Show loading state after a small delay to prevent flickering
+      timeoutId = setTimeout(() => {
+        setDebouncedLoading(true)
+      }, 100)
+    } else {
+      // Hide loading state immediately when not loading
+      setDebouncedLoading(false)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [isLoading])
+
+  // Convert messages array to sections array with better memoization
   const sections = useMemo<ChatSection[]>(() => {
     const result: ChatSection[] = []
     let currentSection: ChatSection | null = null
@@ -136,6 +158,11 @@ export function Chat({
 
     return result
   }, [messages])
+
+  // Create a stable sections key for better performance
+  const sectionsKey = useMemo(() => {
+    return sections.map(section => section.id).join('-')
+  }, [sections])
 
   // Detect if scroll container is at the bottom
   useEffect(() => {
@@ -252,7 +279,7 @@ export function Chat({
         sections={sections}
         data={data}
         onQuerySelect={onQuerySelect}
-        isLoading={isLoading}
+        isLoading={debouncedLoading}
         chatId={id}
         addToolResult={addToolResult}
         scrollContainerRef={scrollContainerRef}
