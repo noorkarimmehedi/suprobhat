@@ -1,7 +1,7 @@
 .button {
-  max-width: 320px;
+  max-width: 240px;
   display: flex;
-  padding: 0.5rem 1.4rem;
+  padding: 0.4rem 1rem;
   font-size: 0.75rem;
   line-height: 1.25rem;
   font-weight: 700;
@@ -11,7 +11,7 @@
   align-items: center;
   border-radius: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  gap: 0.75rem;
+  gap: 0.5rem;
   color: rgb(65, 63, 63);
   background-color: #fff;
   cursor: pointer;
@@ -20,7 +20,7 @@
 }
 
 .button svg {
-  height: 24px;
+  height: 20px;
 }
 
 .button:hover {
