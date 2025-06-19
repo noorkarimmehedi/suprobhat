@@ -59,10 +59,11 @@ export const TextHoverEffect = ({
           textAnchor="middle"
           dominantBaseline="middle"
           strokeWidth="1.5"
-          className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
+          className="fill-transparent stroke-neutral-200 font-bold dark:stroke-neutral-800"
           style={{ 
             opacity: 0.9,
-            fontSize: textSize
+            fontSize: textSize,
+            fontFamily: 'JetBrains Mono, monospace'
           }}
         >
           {text}
@@ -132,10 +133,11 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         strokeWidth="1.5"
-        className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
+        className="fill-transparent stroke-neutral-200 font-bold dark:stroke-neutral-800"
         style={{ 
-          opacity: hovered ? 1 : 0.9,
-          fontSize: textSize
+          opacity: 0.9,
+          fontSize: textSize,
+          fontFamily: 'JetBrains Mono, monospace'
         }}
       >
         {text}
@@ -148,8 +150,8 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         strokeWidth="1.5"
-        className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
-        style={{ fontSize: textSize }}
+        className="fill-transparent stroke-neutral-200 font-bold dark:stroke-neutral-800"
+        style={{ fontSize: textSize, fontFamily: 'JetBrains Mono, monospace' }}
         initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
         animate={{
           strokeDashoffset: 0,
@@ -172,8 +174,8 @@ export const TextHoverEffect = ({
         stroke="url(#textGradient)"
         strokeWidth="1.5"
         mask="url(#textMask)"
-        className="fill-transparent font-[helvetica] font-bold"
-        style={{ fontSize: textSize }}
+        className="fill-transparent font-bold"
+        style={{ fontSize: textSize, fontFamily: 'JetBrains Mono, monospace' }}
       >
         {text}
       </text>
