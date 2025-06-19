@@ -1,4 +1,4 @@
-.personalBrandButton {
+button {
   max-width: 320px;
   display: flex;
   padding: 0.5rem 1.4rem;
@@ -18,10 +18,10 @@
   transition: all .6s ease;
 }
 
-.personalBrandButton svg {
+.button svg {
   height: 24px;
 }
 
-.personalBrandButton:hover {
+button:hover {
   transform: scale(1.02);
 } 
