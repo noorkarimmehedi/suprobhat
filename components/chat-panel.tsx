@@ -823,6 +823,16 @@ export function ChatPanel({
                 onClick={() => handleCraftButtonClick(handleCraftVideoScript)}
                 className={styles.button}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
+                  <g clipPath="url(#clip0_4418_8015)">
+                    <path d="M21.15 6.17C20.74 5.95 19.88 5.72 18.71 6.54L17.24 7.58C17.13 4.47 15.78 3.25 12.5 3.25H6.5C3.08 3.25 1.75 4.58 1.75 8V16C1.75 18.3 3 20.75 6.5 20.75H12.5C15.78 20.75 17.13 19.53 17.24 16.42L18.71 17.46C19.33 17.9 19.87 18.04 20.3 18.04C20.67 18.04 20.96 17.93 21.15 17.83C21.56 17.62 22.25 17.05 22.25 15.62V8.38C22.25 6.95 21.56 6.38 21.15 6.17ZM11 11.38C9.97 11.38 9.12 10.54 9.12 9.5C9.12 8.46 9.97 7.62 11 7.62C12.03 7.62 12.88 8.46 12.88 9.5C12.88 10.54 12.03 11.38 11 11.38Z" fill="white" style={{fill: 'var(--fillg)'}}/>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_4418_8015">
+                      <rect width="24" height="24" fill="white"/>
+                    </clipPath>
+                  </defs>
+                </svg>
                 Craft Great Video Script
               </button>
               <button
@@ -830,6 +840,17 @@ export function ChatPanel({
                 onClick={() => handleCraftButtonClick(handleCraftLearnComplexTopic)}
                 className={styles.button}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#000000">
+                  <g clipPath="url(#clip0_4418_8262)">
+                    <path d="M16.8301 15.6402C17.5001 15.2002 18.3801 15.6802 18.3801 16.4802V17.7702C18.3801 19.0402 17.3901 20.4002 16.2001 20.8002L13.0101 21.8602C12.4501 22.0502 11.5401 22.0502 10.9901 21.8602L7.80012 20.8002C6.60012 20.4002 5.62012 19.0402 5.62012 17.7702V16.4702C5.62012 15.6802 6.50012 15.2002 7.16012 15.6302L9.22012 16.9702C10.0101 17.5002 11.0101 17.7602 12.0101 17.7602C13.0101 17.7602 14.0101 17.5002 14.8001 16.9702L16.8301 15.6402Z" fill="white" style={{fill: 'var(--fillg)'}}/>
+                    <path d="M19.98 6.46055L13.99 2.53055C12.91 1.82055 11.13 1.82055 10.05 2.53055L4.03002 6.46055C2.10002 7.71055 2.10002 10.5405 4.03002 11.8005L5.63002 12.8405L10.05 15.7205C11.13 16.4305 12.91 16.4305 13.99 15.7205L18.38 12.8405L19.75 11.9405V15.0005C19.75 15.4105 20.09 15.7505 20.5 15.7505C20.91 15.7505 21.25 15.4105 21.25 15.0005V10.0805C21.65 8.79055 21.24 7.29055 19.98 6.46055Z" fill="white" style={{fill: 'var(--fillg)'}}/>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_4418_8262">
+                      <rect width="24" height="24" fill="white"/>
+                    </clipPath>
+                  </defs>
+                </svg>
                 Learn Complex Topic
               </button>
             </div>
