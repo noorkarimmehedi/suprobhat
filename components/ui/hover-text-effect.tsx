@@ -39,7 +39,7 @@ export const TextHoverEffect = ({
     }
   }, [cursor]);
 
-  const textSize = isMobile ? "3rem" : "13rem";
+  const textSize = isMobile ? "3rem" : "11rem";
   const viewBox = isMobile ? "0 0 300 120" : "0 0 768 250";
 
   // On mobile, show simplified version without animation
