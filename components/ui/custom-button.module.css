@@ -1,4 +1,4 @@
-.customButton {
+.button {
   max-width: 320px;
   display: flex;
   padding: 0.5rem 1.4rem;
@@ -18,10 +18,10 @@
   transition: all .6s ease;
 }
 
-.customButton svg {
+.button svg {
   height: 24px;
 }
 
-.customButton:hover {
+.button:hover {
   transform: scale(1.02);
 } 
