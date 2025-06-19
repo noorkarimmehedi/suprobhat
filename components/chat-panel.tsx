@@ -805,6 +805,7 @@ export function ChatPanel({
                 onClick={() => handleCraftButtonClick(handleCraftPersonalBrand)}
                 className={styles.button}
               >
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAapJREFUSEudVVu2gzAIHHamK9OuTHeWK4KEALE9Nx891iTAPEACCKAGNPxjEfii/NaL9+Zb1HpuiyIFlTUVtfKrVwRa4wK0TXMsAD5a1T5UF6Dw3xcEcvU6sF8EbvocqeBEPYlPoHULgrkAfPkO3oEGxISVGs5HA69KRzDLQdjRNIHnwnLcF08A67MdQ5kGIlrC2Oy9qeoR+ARB/E6RcV0RdQBgUSdMemuVEFXkQn3l9CBgqfi1cITPVdnoJpcrUJRagqtnFKPII9bRSSGE2TSwL3pIQ5lNCzJd8EwDyyYJBiqd1F3PmwICtgawa/j5cz+Hu5GD3GjJ5tolyTy9stLl+tIa7e1QslDRsV+HXdYgME5YVFsW/rzcZd1rJ/0E7AhSoD45JCiPCumFtO4oKnQNK7tIznHAl8AjaYqGEzEycyAjNhc5dN3786r7zigez6TbZc+qbDrt3te5KxEZweo7P9p0B2H75Qvqx3IAOnR2SEDHNX4LQf2kzKGDvOwuP76HC8+EyJO19PGUNHo+UEEDPxV/YFy5CSdZZBM6JhhH09fPQPBLEI+D/wGXAswhDTmf/gAAAABJRU5ErkJggg==" alt="icon" />
                 Craft a Profitable Personal Brand
               </button>
               <button
