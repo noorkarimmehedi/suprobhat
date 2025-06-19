@@ -16,7 +16,7 @@ const fontMono = FontMono({
   variable: '--font-mono'
 })
 
-const title = 'Arc Lab'
+const title = 'Prospect'
 const description =
   'A fully open-source AI-powered answer engine with a generative UI.'
 
