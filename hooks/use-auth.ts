@@ -1,10 +1,11 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 
 export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -12,10 +13,9 @@ export function useAuth() {
       try {
         const supabase = createClient()
         const { data: { session } } = await supabase.auth.getSession()
-        setIsAuthenticated(!!session)
+        setUser(session?.user ?? null)
       } catch (error) {
-        console.error('Error checking auth status:', error)
-        setIsAuthenticated(false)
+        setUser(null)
       } finally {
         setIsLoading(false)
       }
@@ -26,7 +26,7 @@ export function useAuth() {
     // Set up auth state change listener
     const supabase = createClient()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session)
+      setUser(session?.user ?? null)
     })
 
     return () => {
@@ -34,5 +34,5 @@ export function useAuth() {
     }
   }, [])
 
-  return { isAuthenticated, isLoading }
+  return { user, isLoading }
 } 

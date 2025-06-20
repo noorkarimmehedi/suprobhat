@@ -2,17 +2,15 @@
 
 import GuestMenu from '@/components/guest-menu'
 import UserMenu from '@/components/user-menu'
+import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { ChatHistoryPopover } from './chat-history-popover'
 import styles from './ui/plus-button.module.css'
 
-interface HeaderProps {
-  user: any
-}
-
-export const Header: React.FC<HeaderProps> = ({ user }) => {
+export const Header: React.FC = () => {
+  const { user } = useAuth()
   const router = useRouter()
 
   // Prefetch routes for better navigation performance
