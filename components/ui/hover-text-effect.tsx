@@ -63,7 +63,7 @@ export const TextHoverEffect = ({
           style={{ 
             opacity: 0.9,
             fontSize: textSize,
-            fontFamily: 'Lora, serif'
+            fontFamily: 'Sora, sans-serif'
           }}
         >
           {text}
@@ -137,7 +137,7 @@ export const TextHoverEffect = ({
         style={{ 
           opacity: 0.9,
           fontSize: textSize,
-          fontFamily: 'Lora, serif'
+          fontFamily: 'Sora, sans-serif'
         }}
       >
         {text}
@@ -151,7 +151,7 @@ export const TextHoverEffect = ({
         dominantBaseline="middle"
         strokeWidth="1.5"
         className="fill-transparent stroke-neutral-200 font-bold dark:stroke-neutral-800"
-        style={{ fontSize: textSize, fontFamily: 'Lora, serif' }}
+        style={{ fontSize: textSize, fontFamily: 'Sora, sans-serif' }}
         initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
         animate={{
           strokeDashoffset: 0,
@@ -175,7 +175,7 @@ export const TextHoverEffect = ({
         strokeWidth="1.5"
         mask="url(#textMask)"
         className="fill-transparent font-bold"
-        style={{ fontSize: textSize, fontFamily: 'Lora, serif' }}
+        style={{ fontSize: textSize, fontFamily: 'Sora, sans-serif' }}
       >
         {text}
       </text>
