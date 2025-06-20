@@ -73,6 +73,22 @@
       "toolCallType": "native"
     },
     {
+      "id": "claude-opus-4-20250514",
+      "name": "Claude Opus 4",
+      "provider": "Anthropic",
+      "providerId": "anthropic",
+      "enabled": true,
+      "toolCallType": "native"
+    },
+    {
+      "id": "claude-sonnet-4-20250514",
+      "name": "Claude Sonnet 4",
+      "provider": "Anthropic",
+      "providerId": "anthropic",
+      "enabled": true,
+      "toolCallType": "native"
+    },
+    {
       "id": "gemini-2.0-flash",
       "name": "Gemini 2.0 Flash",
       "provider": "Google Generative AI",
