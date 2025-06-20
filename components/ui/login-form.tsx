@@ -56,7 +56,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
             Sign in to your account
           </h1>
           <p className="text-muted-foreground text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a href="#" className="text-primary hover:underline font-medium">
               Sign up
             </a>
