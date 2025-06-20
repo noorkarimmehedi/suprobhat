@@ -1,7 +1,9 @@
 "use client"
 
+import { createClient } from '@/lib/supabase/client'
 import { motion } from "framer-motion"
 import { Eye, EyeOff, Github, Lock, Mail } from "lucide-react"
+import { useRouter } from 'next/navigation'
 import * as React from "react"
 import { useState } from "react"
 
@@ -12,12 +14,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !password) {
       setError("Please enter both email and password.")
@@ -28,7 +32,19 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       return
     }
     setError("")
-    alert("Sign in successful! (Demo)")
+    setLoading(true)
+    const supabase = createClient()
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+    setLoading(false)
+    if (loginError) {
+      setError(loginError.message)
+      return
+    }
+    // Redirect to dashboard on success
+    router.push('/dashboard')
   }
 
   const togglePasswordVisibility = () => {
@@ -147,8 +163,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           <button
             type="submit"
             className="w-full bg-primary text-primary-foreground font-medium py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            disabled={loading}
           >
-            Sign in
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
