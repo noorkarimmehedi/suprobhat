@@ -472,7 +472,7 @@ export function ChatPanel({
   setShowSignInPopup
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { user, isLoading: isAuthLoading } = useAuth()
   const router = useRouter()
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const isFirstRender = useRef(true)
@@ -624,7 +624,7 @@ export function ChatPanel({
   }
 
   const handleCraftButtonClick = (handler: () => void) => {
-    if (!isAuthenticated) {
+    if (!user) {
       setShowSignInPopup(true)
       return
     }
@@ -755,7 +755,7 @@ export function ChatPanel({
             className={cn('w-full max-w-3xl mx-auto relative px-2 sm:px-0')}
           >
             <div className="relative flex flex-col w-full gap-2 bg-muted rounded-2xl sm:rounded-3xl border border-input">
-              {isAuthenticated ? (
+              {!!user ? (
                 renderInputWithSuperPrompt()
               ) : (
                 <AuthPrompt trigger={renderInputWithSuperPrompt()}>
@@ -765,7 +765,7 @@ export function ChatPanel({
                 </AuthPrompt>
               )}
               <div className="flex items-center justify-between p-2 sm:p-3">
-                {isAuthenticated ? (
+                {!!user ? (
                   renderModelSelector()
                 ) : (
                   <AuthPrompt trigger={renderModelSelector()}>
@@ -778,7 +778,7 @@ export function ChatPanel({
                   <Button
                     type="submit"
                     size="icon"
-                    disabled={!isAuthenticated || isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
+                    disabled={!user || isLoading || input.trim().length === 0 || isToolInvocationInProgress()}
                     className="shrink-0 rounded-full h-8 w-8 sm:h-10 sm:w-10"
                   >
                     <ArrowUp className="size-3 sm:size-4" />
@@ -876,7 +876,7 @@ export function ChatPanel({
           )}
 
           <div className="relative flex flex-col w-full gap-2 bg-muted rounded-2xl sm:rounded-3xl border border-input">
-            {isAuthenticated ? (
+            {!!user ? (
               renderInputWithSuperPrompt()
             ) : (
               <AuthPrompt trigger={renderInputWithSuperPrompt()}>
@@ -898,7 +898,7 @@ export function ChatPanel({
 
             {/* Bottom menu area */}
             <div className="flex items-center justify-between p-2 sm:p-3">
-              {isAuthenticated ? (
+              {!!user ? (
                 renderModelSelector()
               ) : (
                 <AuthPrompt trigger={renderModelSelector()}>
@@ -938,7 +938,7 @@ export function ChatPanel({
                   variant={'outline'}
                   className={cn(isLoading && 'animate-pulse', 'rounded-full h-8 w-8 sm:h-10 sm:w-10')}
                   disabled={
-                    !isAuthenticated ||
+                    !user ||
                     (input.length === 0 && !isLoading) ||
                     isToolInvocationInProgress()
                   }
