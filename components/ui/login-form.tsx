@@ -43,8 +43,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       setError(loginError.message)
       return
     }
-    // Redirect to dashboard on success
-    router.push('/dashboard')
+    // Redirect to homepage on success
+    router.push('/')
   }
 
   const togglePasswordVisibility = () => {
