@@ -1,3 +1,4 @@
+"use client";
 import { PromptInputBox } from "@/components/ui/ai-prompt-box";
 
 const DemoOne = () => {

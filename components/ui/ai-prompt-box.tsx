@@ -1,3 +1,4 @@
+"use client";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { AnimatePresence, motion } from "framer-motion";
