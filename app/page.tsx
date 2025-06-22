@@ -1,9 +1,5 @@
-import { Chat } from '@/components/chat'
-import { getModels } from '@/lib/config/models'
+import { DemoOne } from "@/components/ui/demo";
 
-export const dynamic = 'force-dynamic'
-
-export default async function Home() {
-  const models = await getModels()
-  return <Chat id="new" models={models} />
+export default function Home() {
+  return <DemoOne />;
 }
